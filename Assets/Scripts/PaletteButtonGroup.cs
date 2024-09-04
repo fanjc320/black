@@ -79,7 +79,7 @@ public class PaletteButtonGroup : MonoBehaviour
             paletteButtonList.Add(paletteButton);
         }
 
-        // 첫 번째 팔레트 기본 선택 상태
+        // 第一个调色板默认选择状态
         if (paletteButtonList.Count > 0)
         {
             paletteButtonList[0].Check = true;
@@ -108,12 +108,12 @@ public class PaletteButtonGroup : MonoBehaviour
 
         paletteButton.ColoredRatio = newRatio;
 
-        // 다 칠한 팔레트 버튼은 사라진다.
+        // 涂好的调色板按钮会消失。
         var completed = newRatio >= 1.0f;
         paletteButton.gameObject.SetActive(completed == false);
 
-        // 사라지는 팔레트가 체크되어 있다면 그 다음 것으로 선택되게 한다.
-        // 다음 것이 없으면 앞의 것을
+        // 如果选中了消失的调色板，则选择下一个选项。
+        //如果没有下一个，就把前面的
         if (completed)
         {
             EnsurePaletteCheck(paletteIndex);
@@ -125,7 +125,7 @@ public class PaletteButtonGroup : MonoBehaviour
 
         if (poofPrefab == null) return;
 
-        // 이번에 칠해서 사라졌다. 펑 효과 보여주자.
+        // 这次刷没了。给大家看砰的效果吧
         var poof = Instantiate(poofPrefab, GetComponentInParent<Canvas>().transform).GetComponent<Poof>();
         var poofTransform = poof.transform;
         poofTransform.position = paletteButton.transform.position;

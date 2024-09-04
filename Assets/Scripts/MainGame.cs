@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 public class MainGame : MonoBehaviour
 {
-    static bool Verbose => false;
+    static bool Verbose => true;
 
     static readonly int ColorTexture = Shader.PropertyToID("ColorTexture");
 
@@ -73,7 +73,7 @@ public class MainGame : MonoBehaviour
 
         if (gridWorld == null) return;
 
-        // Lobby 신에서 넘어왔다면 이 조건문이 만족할 것이다.
+        // 如果你是从Lobby神那里过来的，你会满足这个条件的。
         if (StageButton.CurrentStageMetadata != null)
         {
             stageMetadata = StageButton.CurrentStageMetadata;
@@ -91,7 +91,7 @@ public class MainGame : MonoBehaviour
             {
                 await Task.Yield();
             }
-
+            //StageMetadataLocList[47] "Assets/Stages/001/001.asset"-"Assets/Stages/047/047.asset"
             stageMetadata = await Addressables.LoadAssetAsync<StageMetadata>(Data.dataSet.StageMetadataLocList[0]).Task;
 #endif
         }
@@ -135,22 +135,22 @@ public class MainGame : MonoBehaviour
 
         //targetImage.SetTargetImageMaterial(skipBlackMaterial);
 
-        // 플레이어가 색칠한 칸을 하나씩 렌더링하는 컴포넌트
-        // 화면에 보여지는 것은 색칠된 칸이 모두 누적된 형태다.
-        // 이를 위해 Render Texture 이용
+        // 玩家一个一个渲染彩色单元格的组件。
+        //屏幕上显示的是所有着色单元格的累积形式。
+        //为此使用Render Texture
         islandShader3DController.Initialize(stageMetadata);
 
-        // 플레이어가 선택한 팔레트에 해당하는 모든 칸을 특정 색깔로 그리는 컴포넌트
-        // 게임을 더 편-안-하게 플레이할 수 있도록 해 준다.
-        // 그러나 4 스테이지부터 켜준다.
+        // 用特定颜色绘制玩家所选调色板的所有单元格的元件。
+        //让游戏玩得更轻松。
+        //但是从第4阶段开始打开。
         singlePaletteRenderer.gameObject.SetActive(stageMetadata.StageIndex >= 3);
         singlePaletteRenderer.Initialize(stageMetadata);
 
         targetImageOutline.material = stageMetadata.SdfMaterial;
-        // SDF 머티리얼 없으면 아예 이 이미지는 안보이게 하자.
+        // 如果没有SDF Material，干脆不让这个形象出现吧。
         targetImageOutline.enabled = stageMetadata.SdfMaterial != null;
 
-        paletteButtonGroup.CreatePalette(stageData);
+        paletteButtonGroup.CreatePalette(stageData);//创造色彩盘按钮
 
         islandLabelSpawner.CreateAllLabels(stageData);
 

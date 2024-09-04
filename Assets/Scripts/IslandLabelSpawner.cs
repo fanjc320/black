@@ -48,7 +48,7 @@ public class IslandLabelSpawner : MonoBehaviour
     }
 
     public void CreateAllLabels(StageData stageData)
-    {
+    {//maxRectDict[50]  "[9764864, (x:0, y:1031, width:904, height:320)]" - ...
         var maxRectDict = stageData.islandDataByMinPoint.ToDictionary(e => e.Key, e => GetRectRange(e.Value.maxRect));
 
         var rectIndex = 0;
@@ -65,7 +65,7 @@ public class IslandLabelSpawner : MonoBehaviour
                 islandLabelNumberSubgroup =
                     new GameObject($"Island Label Subgroup ({rectIndex:d4}-{rectIndex + subgroupCapacity - 1:d4})");
                 islandLabelNumberSubgroup.transform.parent = islandLabelNumberGroup;
-                var subGroupRt = islandLabelNumberSubgroup.AddComponent<RectTransform>();
+                var subGroupRt = islandLabelNumberSubgroup.AddComponent<RectTransform>();//"Island Label Subgroup (0000-0049) (UnityEngine.RectTransform)"
                 subGroupRt.anchoredPosition3D = Vector3.zero;
                 subGroupRt.localScale = Vector3.one;
             }
@@ -75,11 +75,11 @@ public class IslandLabelSpawner : MonoBehaviour
                 Debug.LogError($"Logic error. {nameof(islandLabelNumberSubgroup)} should not be null at this point.");
                 continue;
             }
-
+            //"Island Label(Clone) (IslandLabel)"
             var label = Instantiate(islandLabelNumberPrefab, islandLabelNumberSubgroup.transform)
                 .GetComponent<IslandLabel>();
-            var labelRt = label.Rt;
-            var texSizeFloat = (float) gridWorld.TexSize;
+            var labelRt = label.Rt;//"Island Label(Clone) (UnityEngine.RectTransform)"
+            var texSizeFloat = (float) gridWorld.TexSize;//1500
             var delta = rt.sizeDelta;
             var anchoredPosition = kv.Value.center / texSizeFloat * delta - delta / 2;
             labelRt.anchoredPosition = anchoredPosition;
@@ -87,8 +87,8 @@ public class IslandLabelSpawner : MonoBehaviour
             labelRt.sizeDelta = sizeDelta;
             var paletteIndex = paletteButtonGroup.GetPaletteIndexByColor(stageData.islandDataByMinPoint[kv.Key].rgba);
             label.Text = (paletteIndex + 1).ToString();
-            labelByMinPoint[kv.Key] = label;
-            label.name = $"Island Label {rectIndex:d4} #{paletteIndex + 1:d2}";
+            labelByMinPoint[kv.Key] = label;//"Island Label 0000 #15 (IslandLabel)"
+            label.name = $"Island Label {rectIndex:d4} #{paletteIndex + 1:d2}";//"Island Label 0000 #15"
             rectIndex++;
         }
     }

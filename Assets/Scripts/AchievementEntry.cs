@@ -20,12 +20,12 @@ public class AchievementEntry : MonoBehaviour
 
     public Text rewardGemText;
 
-    // 버튼 콜백
+    //按钮回调
     public void Redeem()
     {
         if (achievementRedeemButton != null && achievementRedeemButton.RepeatedThresholdSatisfied)
         {
-            // 연속 구매 상태에서 터치 종료 시 구매가 하나 더 추가되는 증상을 막자.
+            // 在连续购买状态下，防止触摸结束时增加一个购买的症状。
         }
         else
         {
@@ -35,11 +35,11 @@ public class AchievementEntry : MonoBehaviour
 
     public void RedeemInternal()
     {
-        // 비활성화됐다는 뜻은 보상 받을 조건 만족하지 못했단 뜻이다.
+        // 禁用的意思是没有满足得到补偿的条件。
         if (redeemButton.interactable == false) return;
 
         // add reward
-        // TODO 애니메이션은 다음 빌드에 넣는다
+        // TODO 动画放在下一个版本中
         // var clonedGameObject = InstantiateLocalized.InstantiateLocalize(rewardGemImage.gameObject,
         //     BlackContext.Instance.AnimatedIncrementParent, true);
         BlackContext.Instance.AddGoldSafe((ulong) achievementData.rewardGem.ToLong());
@@ -58,8 +58,8 @@ public class AchievementEntry : MonoBehaviour
             Debug.LogErrorFormat("Unknown achievement condition: {0}", achievementData.condition);
 
         // refresh achievement popup
-        // *** 여기서 다시 갱신할 필요는 없다. BlackContext.Instance.achievementRedeemed의 프로퍼티가 변경될 때
-        // *** 암묵적으로 갱신이 된다. 여기서 하면 같은 일을 두 번 하는 것이다.
+        // *** 没有必要在这里重新更新。BlackContext.Instance.achievementRedeemed的属性发生变化时
+        // *** 默认更新。在这里做同样的事情就是做两次。
         // GetComponentInParent<AchievementPopup>().UpdateAchievementTab();
         SaveLoadManager.Save(BlackContext.Instance, ConfigPopup.Instance, Sound.Instance, Data.Instance, null);
     }

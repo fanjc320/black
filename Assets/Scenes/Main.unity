@@ -270,7 +270,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC644\uC131"
+  m_Text: "\u5B8C\u6210"
 --- !u!222 &17557695
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1429,7 +1429,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uD655\uC778"
+  m_Text: "\u786E\u8BA4"
 --- !u!222 &157470464
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1840,7 +1840,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\uB0A8\uC740 \uC2DC\uAC04\n15:00"
+  m_Text: "\u5269\u4F59\u65F6\u95F4\n15:00"
 --- !u!222 &396409799
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2788,7 +2788,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uB2EB\uAE30"
+  m_Text: "\u5173\u95ED"
 --- !u!222 &727886890
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5793,7 +5793,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uAC00\uB098\uAC00\uC640 \uD574\uBCC0\uC758 \uB192\uC740 \uD30C\uB3C4\uC544\uB798"
+  m_Text: "\u5728\u795E\u5948\u5DDD\u6D77\u8FB9\u7684\u5DE8\u6D6A\u4E0B"
 --- !u!1 &1208640987
 GameObject:
   m_ObjectHideFlags: 0
@@ -6249,7 +6249,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC9C0\uC624\uBC18\uB2C8 \uBC14\uD2F0\uC2A4\uD0C0 \uC0B4\uBE44"
+  m_Text: "\u5409\u5965\u73ED\u5C3C\xB7\u5DF4\u8482\u65AF\u5854\xB7\u8428\u5C14\u7EF4"
 --- !u!1 &1388013197
 GameObject:
   m_ObjectHideFlags: 0
@@ -11844,7 +11844,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC800\uC7A5 \uB370\uC774\uD130 \uB9AC\uC14B"
+  m_Text: "\u91CD\u7F6E\u5B58\u50A8\u6570\u636E"
 --- !u!222 &1528663155
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14000,8 +14000,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uAC01\uAC01 \uBC30\uCE58\uB418\uC5B4 \uC788\uB294 \uC0AC\uACFC\uC640
-    \uC815\uBB3C\uC5D0\uC11C \uACE0\uC9D1\uC774 \uB290\uAEF4\uC9C4\uB2E4"
+  m_Text: "\u5728\u5206\u522B\u653E\u7F6E\u7684\u82F9\u679C\u548C\u9759\u7269\u4E2D\u611F\u5230\u56FA\u6267"
 --- !u!222 &1933340605
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -15227,6 +15226,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1086465459}
     m_Modifications:
+    - target: {fileID: 6103630088173484246, guid: 2057e915fa55942f9849fe24f6637b2b,
+        type: 3}
+      propertyPath: m_Text
+      value: "\u6210\u5C31\uFF1A10\u7EC4\u5408"
+      objectReference: {fileID: 0}
     - target: {fileID: 6103630088786197050, guid: 2057e915fa55942f9849fe24f6637b2b,
         type: 3}
       propertyPath: m_Name
