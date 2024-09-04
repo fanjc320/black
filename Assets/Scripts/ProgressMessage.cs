@@ -38,15 +38,14 @@ public class ProgressMessage : MonoBehaviour, IPlatformProgressMessage
         subcanvas.Close();
     }
 
-    //타 팝업에서도 필요시 호출해서 사용.
+    //必要时也可以在其他弹窗中调用和使用。
     public void PushCloseButton()
     {
         ConDebug.Log("ProgressMessage Force Close Push by user.");
         Close();
     }
 
-    //네트워크 옵션 등 뒤로가기를 처리할수 없는 상태를 무시하기 위한 메소드.
-    //주의깊게 사용할것.
+    //忽略无法处理 back 的情况的方法，例如网络选项，请谨慎使用。
     public void ForceBackButtonActive()
     {
         subcanvas.ForceBackButtonHandler = true;
