@@ -17,7 +17,7 @@ public class StageMetadata : ScriptableObject
     [SerializeField]
     Texture2D a2Tex;
 
-    // 외곽선(블랙)으로 칠 색상의 최대치. 숫자가 커질수록 애매하게 검은 색상도 완전한 검은색으로 취급된다. 
+    // 轮廓填充的最大颜色（黑色）。随着数字的增加，即使是模糊的黑色也会被视为完全黑色。
     [SerializeField]
     int outlineThreshold = 30;
 
@@ -31,7 +31,7 @@ public class StageMetadata : ScriptableObject
 
     public StageSequenceData StageSequenceData => Data.dataSet.StageSequenceData[StageIndex];
 
-    // [NonSerialized] 속성을 안붙이면 cachedStageData가 null이 아니면서 내용물이 다 텅 빈 상태가 되기도 한다...
+    // [NonSerialized] 如果不附加该属性，cachedStageData 可能不为 null 并且内容可能为空...
     // 왜지...?
     [NonSerialized]
     StageData cachedStageData;

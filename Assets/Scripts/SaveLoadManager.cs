@@ -75,7 +75,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
     void Start()
     {
-        // 저장 데이터 로드 *** 다른 모든 초기화 이전에 완료되어 있어야 하는 작업 ***
+        // 加载保存数据 *** 在任何其他初始化之前必须完成的任务 ***
         Load(blackContext);
     }
 
@@ -258,7 +258,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
     static void Load(IBlackContext context)
     {
-        // 모든 세이브 슬롯에 대해 로드를 성공 할 때까지 시도한다.
+        // 尝试加载所有保存槽直至成功。
         var exceptionList = new List<Exception>();
 
         for (var i = 0; i < maxSaveDataSlot; i++)
@@ -266,31 +266,31 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
             {
                 if (LoadInternal(context))
                 {
-                    // 저장 파일 중 하나는 제대로 읽히긴 했다.
+                    // 已正确读取其中一个保存文件。
                     if (i != 0)
-                        // 그런데 한번 이상 실패했다면 에러 메시지는 보여준다.
+                        // 但是，如果多次失败，则会显示错误消息。
                         Debug.LogError($"Save data rolled back {i} time(s)...!!!");
 
-                    // 게임은 속행하면 된다. 롤백이 됐건 안됐건 읽긴 읽었다...
+                    // 比赛可以继续进行。不管是不是回滚，我都读过……
                     return;
                 }
 
-                // 뭔가 예외 발생에 의한 실패는 아니지만 실패일 수도 있다.
-                // 어쩄든 실패긴 실패.
-                // 이전 슬롯으로 넘어간다.
+                // 可能不是因为发生异常而失败，但也有可能是失败。
+                // 无论如何，失败就是失败。
+                // 转到上一个槽。
                 exceptionList.Add(new Exception("Black Save Data Load Exception"));
                 DecreaseSaveDataSlotAndWrite();
             }
             catch (NotSupportedBlackSaveDataVersionException e)
             {
-                // 지원되지 않는 저장 파일 버전
+                // 不支持的保存文件版本
                 Debug.LogWarning(e.ToString());
                 exceptionList.Add(e);
                 DecreaseSaveDataSlotAndWrite();
             }
             catch (SaveFileNotFoundException e)
             {
-                // 세이브 파일 자체가 없네?
+                // 本身没有保存文件吗？
                 Debug.LogWarning(e.ToString());
                 exceptionList.Add(e);
                 DecreaseSaveDataSlotAndWrite();
@@ -311,10 +311,10 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
             }
             catch (Exception e)
             {
-                // 세이브 파일 읽는 도중 알 수 없는 예외 발생
-                // 무언가 크게 잘못됐어...
-                // 큰일이다~~
-                // 이전 슬롯으로 넘어간다.
+                // 读取保存文件时发生未知异常
+                // 发生了非常错误的事情...
+                // 这可是大事啊~~
+                // 转到上一个槽。
                 Debug.LogException(e);
                 exceptionList.Add(e);
                 DecreaseSaveDataSlotAndWrite();
@@ -323,8 +323,8 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
         if (exceptionList.All(e => e.GetType() == typeof(SaveFileNotFoundException)))
         {
-            // 세이브 파일이 하나도 없다.
-            // 신규 유저다~~~ 풍악을 울려라~~~~~
+            // 没有保存文件。
+            // 我是新用户~~~让风铃响~~~~~~
             ProcessNewUser(context, exceptionList[0]);
         }
         else if (exceptionList.Any(e => e.GetType() == typeof(NotSupportedBlackSaveDataVersionException)))
@@ -333,7 +333,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
                 e.GetType() == typeof(NotSupportedBlackSaveDataVersionException));
             if (exception != null)
             {
-                // 새 버전으로 업그레이드하면 해결되는 문제다.
+                // 这个问题可以通过升级到新版本来解决。
                 ProcessCriticalLoadErrorPrelude(exceptionList);
                 ProcessUpdateNeededError(exception.SaveFileVersion);
             }
@@ -362,11 +362,11 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
     {
         var blackSaveData = LoadBlackSaveData();
 
-        // 세이브 데이터 자체에 오류가 있는 케이스이다.
+        // 这是保存数据本身有错误的情况。
         if (blackSaveData.version < 1) return false;
 
         var oldVersion = blackSaveData.version;
-        // 최신 버전 데이터로 마이그레이션
+        // 迁移到最新版本数据
         MigrateBlackSaveData(blackSaveData);
 
         if (blackSaveData.version == LatestVersion)
@@ -379,7 +379,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
                 Debug.LogError(
                     "NotSupportedBlackSaveDataVersionException should be thrown at this point in devices. In editor, you can proceed without error...");
             else
-                // 저장 파일 버전이 더 높다? 아마도 최신 버전에서 저장한 클라우드 저장 파일을 예전 버전 클라이언트에서 클라우드 불러오기 한 듯
+                // 存档版本高吗？看来最新版本保存的云保存文件是在旧版本客户端中从云端加载的。
                 throw new NotSupportedBlackSaveDataVersionException(blackSaveData.version);
         }
         else
@@ -388,13 +388,13 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
                 $"[CRITICAL ERROR] Latest version {LatestVersion} not match save file latest version field {blackSaveData.version}!!!");
         }
 
-        // 치트 모드 판별 여부에 따라 아래 코드의 작동이 달라진다.
-        // 최대한 먼저 하자.
-        // (예를 들어 context.LastDailyRewardRedeemedIndex 대입 시 리더보드 등록을 할 것인지 말 것인지 등)
+        // 以下代码的操作根据是否确定作弊模式而变化。
+        // 让我们尽早开始吧。
+        // (比如分配context.LastDailyRewardRedeemedIndex时是否注册排行榜等)
         context.CheatMode = blackSaveData.cheatMode;
         context.WaiveBan = blackSaveData.waiveBan;
 
-        // 부정 이용자 검출되기라도 한다면 이 정보가 먼저 필요하므로 먼저 로드하자.
+        // 如果检测到欺诈用户，则首先需要此信息，因此请先加载它。
         if (blackSaveData.userPseudoId <= 0) blackSaveData.userPseudoId = NewUserPseudoId();
 
         context.UserPseudoId = blackSaveData.userPseudoId;
@@ -405,10 +405,10 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         context.SetDebrisState(blackSaveData.clearedDebrisIndexList);
         context.SetStageLockRemainTime(blackSaveData.stageLockRemainTime);
 
-        // 부정 이용 사용자 걸러낸다.
-        // 다만, 부정 이용 사용자가 아닌데 걸러진 경우 개발팀 문의를 통해 풀 수 있다.
-        // 그렇게 풀린 유저는 context.waiveBan이 true를 해 주기로 한다.
-        // 그렇다면 이 루틴은 아예 작동하지 않는다.
+        // 过滤掉欺诈用户。
+        // 但如果过滤掉的用户不是欺诈用户，可以联系开发团队解决。
+        // 这样释放的用户决定将context.waiveBan设置为true。//waive放弃，waiveBan解禁
+        // 那么这个例程将根本不起作用。
         if (context.WaiveBan == false)
         {
             var targetIdList = new string[]
@@ -431,13 +431,13 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         context.SetGemZero();
         context.AddFreeGem(blackSaveData.freeGemScUInt128);
         context.AddPaidGem(blackSaveData.paidGemScUInt128);
-        
-        // 보석 변화 애니메이션 되돌린다.
+
+        // 恢复宝石变化动画。
         var gemBigInt = context.Gem;
         BlackLogManager.Add(BlackLogEntry.Type.GemToLoaded, 0,
             gemBigInt < long.MaxValue ? (long) gemBigInt : long.MaxValue);
 
-        // 슬롯 용량 변화 애니메이션 잠시 끈다.
+        // 暂时关闭插槽容量变化动画。
 
         context.SetPendingGold(blackSaveData.pendingGoldScUInt128);
         context.PendingFreeGem = blackSaveData.pendingFreeGemScUInt128;
@@ -456,7 +456,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         context.ApplyPendingGold();
         context.ApplyPendingFreeGem();
 
-        // 업적
+        // 成就
         context.AchievementGathered = new AchievementRecord1(false);
         context.AchievementRedeemed = new AchievementRecord1(false);
 
@@ -483,7 +483,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         ConfigPopup.Instance.IsAlwaysOnOn = blackSaveData.alwaysOn;
         ConfigPopup.Instance.IsBigScreenOn = blackSaveData.bigScreen;
 
-        // 토글 콜백은 값이 변경됐을 때만 호출되므로, 강제로 한번 호출해준다.
+        // Toggle 回调仅在值更改时调用，因此强制调用一次。
         ConfigPopup.SetPerformanceMode(ConfigPopup.Instance.IsPerformanceModeOn);
 
         if (context.CheatMode) BlackLogManager.Add(BlackLogEntry.Type.GameCheatEnabled, 0, 0);

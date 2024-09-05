@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class StageDetailPopup : MonoBehaviour
 {
-    // 본 컴포넌트는 리플레이용과 새 스테이지 언락용 별개로 쓰고 있으므로 싱글턴 패턴 쓰지 않는다.
+    // 该组件单独用于重放和解锁新阶段，因此它不使用单例模式。
     //public static StageDetailPopup instance;
 
     [SerializeField]
@@ -65,34 +65,35 @@ public class StageDetailPopup : MonoBehaviour
         stageLocker.OnStageUnlocked -= OnStageUnlocked;
     }
 
-    // stageId가 아니라 stageIndex로 받는 점을 유의한다.
-    // lastClearedStageId를 인자로 넣으면 다음으로 플레이 할 판으로 설정된다.
+    // stageId请注意，它是作为 stageIndex 接收的，而不是 。
+    // lastClearedStageId如果作为参数输入，则将其设置为要玩的下一个棋盘。
     public async Task OpenPopupAfterLoadingAsync(int stageIndex)
     {
         if (stageIndex < 0) stageIndex = 0;
 
-        // 한번 깼던 판 다시 꺠려고 하는 것인가?
+        // 您是否想破坏您曾经破坏过的游戏？
         replay = stageIndex + 1 <= BlackContext.Instance.LastClearedStageId;
 
         if (IsAllCleared && replay == false)
         {
             //Debug.LogError("lastClearedStageId exceeds Data.dataSet.StageMetadataList count.");
-            ConfirmPopup.Instance.Open(@"\모든 스테이지를 깼습니다!\n진정한 미술관 재건이 시작되는 다음 업데이트를 기대 해 주세요!".Localized(),
+            ConfirmPopup.Instance.Open(@"\所有关卡均已通关！\n真正的博物馆重建开始时，敬请期待下一次更新!".Localized(),
                 ConfirmPopup.Instance.Close);
             return;
         }
 
         stageProgress.ProgressInt = stageIndex % 5;
 
-        ProgressMessage.Instance.Open(@"\그림을 준비하는 중...".Localized());
+        ProgressMessage.Instance.Open(@"\正在准备图片...".Localized());
 
-        // 마지막 클리어한 ID는 1-based이고, 아래 함수는 0-based로 작동하므로
-        // 다음으로 플레이할 스테이지를 가져올 때는 그대로 ID를 넘기면 된다.
-        var stageMetadata = await LoadStageMetadataByZeroBasedIndexAsync(stageIndex);
+        // 最后清除的 ID 是从 1 开始的，下面的函数是从 0 开始操作的。
+        // 当您检索下一个要播放的舞台时，只需按原样传递 ID 即可。
+        //var stageMetadata = await LoadStageMetadataByZeroBasedIndexAsync(stageIndex);
+        var stageMetadata = await LoadStageMetadataByZeroBasedIndexAsync(46);
 
         if (stageMetadata == null)
         {
-            // 중대 문제
+            // 一个主要问题
             Debug.LogError("Stage metadata is null");
             return;
         }
@@ -119,18 +120,18 @@ public class StageDetailPopup : MonoBehaviour
         var resumed = stageButton.SetStageMetadata(stageMetadata);
         subcanvas.Open();
 
-        // 하다가 만 스테이지면 대기 시간 있어선 안된다.
-        // 초반 스테이지는 대기 시간 없다.
-        if (replay || resumed || stageMetadata.StageSequenceData.skipLock)
+        // 如果您在玩时完成一个阶段，则不应该有任何等待时间。
+        // 前期没有等待时间。
+        //if (replay || resumed || stageMetadata.StageSequenceData.skipLock)
         {
             stageLocker.Unlock();
         }
-        else
+        //else
         {
-            stageLocker.Lock();
+            //stageLocker.Lock();
         }
 
-        stageProgress.Show(replay == false);
+        //stageProgress.Show(replay == false);
 
         if (easelExclamationMark != null)
         {
@@ -141,17 +142,17 @@ public class StageDetailPopup : MonoBehaviour
         {
             if (BlackContext.Instance.LastClearedStageId == 0)
             {
-                bottomTip.SetMessage("\\시작하기를 눌러 색칠을 시작하세요~!".Localized());
+                bottomTip.SetMessage("\\单击“开始”开始着色~!".Localized());
                 bottomTip.OpenSubcanvas();
             }
             else if (BlackContext.Instance.LastClearedStageId == 1)
             {
-                bottomTip.SetMessage("\\잘 했어요! 다음 스테이지도 어서어서 색칠합시다.".Localized());
+                bottomTip.SetMessage("\\好工作！让我们赶紧为下一个阶段上色吧.".Localized());
                 bottomTip.OpenSubcanvas();
             }
             else if (BlackContext.Instance.LastClearedStageId == 4)
             {
-                bottomTip.SetMessage("\\이번 스테이지는 시간제한이 있는 '관문 스테이지'예요! 파이팅!!!".Localized());
+                bottomTip.SetMessage("\\这个阶段是有时间限制的‘入门阶段’！大胆试试吧!!!".Localized());
                 bottomTip.OpenSubcanvas();
             }
         }
@@ -205,7 +206,7 @@ public class StageDetailPopup : MonoBehaviour
 
         if (BlackContext.Instance.LastClearedStageId == 0)
         {
-            bottomTip.SetMessage("\\이젤을 터치해서 색칠할 그림을 확인해봐요.".Localized());
+            bottomTip.SetMessage("\\触摸画架以检查您想要着色的图片.".Localized());
         }
         else
         {
@@ -229,7 +230,7 @@ public class StageDetailPopup : MonoBehaviour
                 var stageTitle = Data.dataSet.StageSequenceData[stageMetadata.StageIndex].title;
 
                 ConfirmPopup.Instance.OpenYesNoPopup(
-                    @"\'{0}' 스테이지를 시작할까요?\n\n설정 메뉴에서 언제든지 미술관으로 돌아올 수 있습니다.".Localized(stageTitle),
+                    @"\'{0}' 您想开始舞台吗？\n\n您可以随时从设置菜单返回博物馆.".Localized(stageTitle),
                     GoToMain, ConfirmPopup.Instance.Close);
             }
             else
@@ -261,11 +262,11 @@ public class StageDetailPopup : MonoBehaviour
 
     void OnStageUnlocked()
     {
-        startStageButtonText.text = @"\바로 시작".Localized();
+        startStageButtonText.text = @"\现在开始".Localized();
     }
 
     void OnStageLocked()
     {
-        startStageButtonText.text = @"\광고 시청 후 바로 시작".Localized();
+        startStageButtonText.text = @"\观看广告后立即开始".Localized();
     }
 }

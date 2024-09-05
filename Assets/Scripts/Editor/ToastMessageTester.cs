@@ -10,11 +10,11 @@ public class ToastMessageTester : Editor
 
         if (GUILayout.Button("Good"))
         {
-            ToastMessage.Instance.PlayGoodAnim("업적달성: 10콤보");
+            ToastMessage.Instance.PlayGoodAnim("成就：10组合");
         }
         else if (GUILayout.Button("Warning"))
         {
-            ToastMessage.Instance.PlayWarnAnim("색을 다시 확인해주세요");
+            ToastMessage.Instance.PlayWarnAnim("请重新确认颜色。");
         }
     }
 }

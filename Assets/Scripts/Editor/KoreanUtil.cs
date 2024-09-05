@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class KoreanUtil
 {
-    [MenuItem("Assets/Black/자소 분리 문제 수정하기")]
+    [MenuItem("Assets/Black/修复字素分离问题")]
     static void FixFileKoreanFileNamesMultipleSelection()
     {
         foreach (var o in Selection.objects)
@@ -25,7 +25,7 @@ public static class KoreanUtil
         {
             Debug.Log($"Normalizing graph file '{assetPath}' to '{assetPathNormalized}'...");
 
-            // AssetDatabase.RenameAsset()으로는 해결되지 않는다.    
+            // AssetDatabase.RenameAsset()它不是通过以下方式解决的   
             File.Move(assetPath, assetPathNormalized);
         }
     }

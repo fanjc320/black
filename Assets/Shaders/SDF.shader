@@ -86,7 +86,7 @@
 
                 Distance += DistanceOffset;
                 Distance *= StripeCount;
-                float Stripef = fmod( Distance, ColorCount );
+                float Stripef = fmod(Distance, ColorCount); //fmod() 用来对浮点数进行取模（求余）
                 int Stripe = Stripef;
                 return GetColor( Stripe );
             }

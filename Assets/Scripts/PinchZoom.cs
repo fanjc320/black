@@ -69,7 +69,7 @@ public class PinchZoom : MonoBehaviour
         // Find the difference in the distances between each frame.
         var deltaMagnitudeDiff = newMultiTouchDistance - lastMultiTouchDistance;
 
-        // Slider 콜백을 유도한다.
+        // Slider 诱导回调。
         ZoomValue = Mathf.Clamp(ZoomValue + deltaMagnitudeDiff * sensitivity, minScale, maxScale);
 
         // Set the last distance calculation

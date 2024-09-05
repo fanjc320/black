@@ -10,7 +10,7 @@ public class AchievePopup : MonoBehaviour
 {
     public static AchievePopup Instance;
 
-    // 표시 순서 때문에 순서를 정할 목적으로 만든 배열
+    //为确定显示顺序而创建的数组
     static readonly string [] priority =
     {
         "MaxBlackLevel",

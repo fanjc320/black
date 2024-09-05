@@ -112,7 +112,7 @@ internal static class StageEditorUtil
 
     [MenuItem("Assets/Black/Import New Stage (Raw Data)")]
     [UsedImplicitly]
-    static void ImportNewStage_RawData()
+    static void ImportNewStage_RawData()//似乎是选择Stages目录下的imgs 文本文件，然后点击Assets/Black/Import New Stage (Raw Data)就会生成sdf-material
     {
         foreach (var o in Selection.objects)
         {

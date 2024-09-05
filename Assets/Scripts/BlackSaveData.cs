@@ -25,7 +25,8 @@ public class BlackSaveData
     public ScUInt128 freeGemScUInt128 = 0;
 
     [Key(23)]
-    public BlackLanguageCode languageCode = BlackLanguageCode.Ko;
+    //public BlackLanguageCode languageCode = BlackLanguageCode.Ko;
+    public BlackLanguageCode languageCode = BlackLanguageCode.Ch;
 
     [Key(1)]
     public ScInt lastClearedStageId;
