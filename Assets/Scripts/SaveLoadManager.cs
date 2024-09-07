@@ -27,7 +27,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
     public static SaveLoadManager Instance;
 
-    // 총 maxSaveDataSlot개의 저장 슬롯이 있고, 이를 돌려가며 쓴다.
+    // 总共有 maxSaveDataSlot 保存槽，这些槽是轮流使用的
     public static readonly int maxSaveDataSlot = 9;
     static readonly string saveDataSlotKey = "Save Data Slot";
 
@@ -87,7 +87,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
     public static string GetSaveLoadFileNameOnly(int saveDataSlot)
     {
         saveDataSlot = PositiveMod(saveDataSlot, maxSaveDataSlot);
-        // 하위 호환성을 위해 0인 경우 기존 이름을 쓴다.
+        // 为了向后兼容，如果为 0，则使用现有名称。
         return saveDataSlot == 0 ? localSaveFileName : $"save{saveDataSlot}.dat";
     }
 
@@ -96,23 +96,23 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         return PlayerPrefs.GetInt(saveDataSlotKey, 0);
     }
 
-    // 저장 슬롯 증가 (성공적인 저장 후 항상 1씩 증가되어야 함)
+    // 增加保存槽（成功保存后应始终增加 1）
     public static void IncreaseSaveDataSlotAndWrite()
     {
         var oldSaveDataSlot = GetSaveSlot();
         var newSaveDataSlot = PositiveMod(oldSaveDataSlot + 1, maxSaveDataSlot);
-        ConDebug.Log($"Increase save data slot from {oldSaveDataSlot} to {newSaveDataSlot}...");
+        ConDebug.Log($"Increase save data slot from {oldSaveDataSlot} to {newSaveDataSlot}...saveDataSlotKey:{saveDataSlotKey}");
         PlayerPrefs.SetInt(saveDataSlotKey, newSaveDataSlot);
         PlayerPrefs.Save();
         ConDebug.Log($"Increase save data slot from {oldSaveDataSlot} to {newSaveDataSlot}... OKAY");
     }
 
-    // 저장 슬롯 감소 (불러오기 실패 후 항상 1씩 감소되어야 함)
+    // 减少保存槽（加载失败后应始终减 1）
     public static void DecreaseSaveDataSlotAndWrite()
     {
         var oldSaveDataSlot = GetSaveSlot();
         var newSaveDataSlot = PositiveMod(oldSaveDataSlot - 1, maxSaveDataSlot);
-        ConDebug.Log($"Decrease save data slot from {oldSaveDataSlot} to {newSaveDataSlot}...");
+        ConDebug.Log($"Decrease save data slot from {oldSaveDataSlot} to {newSaveDataSlot}...saveDataSlotKey:{saveDataSlotKey}");
         PlayerPrefs.SetInt(saveDataSlotKey, newSaveDataSlot);
         PlayerPrefs.Save();
         ConDebug.Log($"Decrease save data slot from {oldSaveDataSlot} to {newSaveDataSlot}... OKAY");
@@ -139,8 +139,8 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         {
             File.Delete(GetSaveLoadFilePathName(i));
         }
-        
-        // 모든 Persistent 파일 삭제... 괜찮은가?
+
+        // 删除所有持久文件...可以吗？?
         foreach (var filePath in Directory.GetFiles(Application.persistentDataPath, "*", SearchOption.AllDirectories))
         {
             File.Delete(filePath);
@@ -151,10 +151,10 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
     public static bool Save(IBlackContext context, ConfigPopup configPopup, Sound sound, Data data, StageSaveData wipStageSaveData)
     {
-        // 에디터에서 간혹 게임 플레이 시작할 때 Load도 호출되기도 전에 Save가 먼저 호출되기도 한다.
-        // (OnApplicationPause 통해서)
-        // 실제 기기에서도 이럴 수 있나? 이러면 망인데...
-        // 그래서 플래그를 하나 추가한다. 이 플래그는 로드가 제대로 한번 됐을 때 true로 변경된다.
+        // 在编辑器中，有时当您开始玩游戏时，甚至会在调用 Load 之前调用 Save。
+        //（通过OnApplicationPause）
+        // 这会发生在真实设备上吗？如果发生这种事，那就毁了……
+        // 所以添加一个标志。当正确加载后，该标志将变为 true。
         if (context == null || context.LoadedAtLeastOnce == false)
         {
             Debug.LogWarning(
@@ -182,7 +182,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
             wipStageSaveData = wipStageSaveData,
             performanceMode = ConfigPopup.Instance.IsPerformanceModeOn,
         };
-
+        Debug.Log($" ****** Save()  LastClearedStageId:{blackSaveData.lastClearedStageId} maxBlackLevelGathered:{blackSaveData.maxBlackLevelGathered}");
         return SaveBlackSaveData(blackSaveData);
     }
 
@@ -208,21 +208,21 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
     {
         //ConDebug.LogFormat("Start Saving JSON Data: {0}", JsonUtility.ToJson(blackSaveData));
         var saveDataArray = MessagePackSerializer.Serialize(blackSaveData, Data.DefaultOptions);
-        ConDebug.LogFormat("Saving path: {0}", SaveFileName);
+        ConDebug.LogFormat("Saving path SaveFileName: {0}", SaveFileName);
         if (lastSaveDataArray != null && lastSaveDataArray.SequenceEqual(saveDataArray))
             ConDebug.LogFormat("Saving skipped since there is no difference made compared to last time saved.");
         else
             try
             {
-                // 진짜 쓰자!!
+                // 让我们真正使用它!!
                 WriteAllBytesAtomically(SaveFileName, saveDataArray);
 
-                // 마지막 저장 데이터 갱신
+                // 更新上次保存的数据
                 lastSaveDataArray = saveDataArray;
                 ConDebug.Log($"{SaveFileName} Saved. (written to disk)");
 
-                // 유저 서비스를 위해 필요할 수도 있으니까 개발 중일 때는 base64 인코딩 버전 세이브 파일도 저장한다.
-                // 실서비스 버전에서는 불필요한 기능이다.
+                // 由于用户服务可能需要，因此在开发过程中也会保存一个base64编码版本的保存文件。
+                // 这是实际服务版本中不必要的功能。
                 if (Application.isEditor)
                 {
                     var base64Path = SaveFileName + ".base64.txt";
@@ -514,7 +514,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
         NoticeManager.Instance.CheckNoticeSilently();
 
-        // 인앱 상품 구매 내역 디버그 정보
+        // 应用内产品购买历史调试信息
         ConDebug.Log("=== Purchased Begin ===");
         if (blackSaveData.purchasedProductDict != null)
             foreach (var kv in blackSaveData.purchasedProductDict)
@@ -522,7 +522,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
         ConDebug.Log("=== Purchased End ===");
 
-        // 인앱 상품 영수증 디버그 정보
+        // 应用内产品收据调试信息
         ConDebug.Log("=== Purchased Receipt ID Begin ===");
         if (blackSaveData.purchasedProductReceipts != null)
             foreach (var kv in blackSaveData.purchasedProductReceipts)
@@ -531,7 +531,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
         ConDebug.Log("=== Purchased Receipt ID End ===");
 
-        // 인앱 상품 영수증 (검증 완료) 디버그 정보
+        // 应用内产品收据（已验证）调试信息
         ConDebug.Log("=== VERIFIED Receipt ID Begin ===");
         if (blackSaveData.verifiedProductReceipts != null)
             foreach (var v in blackSaveData.verifiedProductReceipts)
@@ -589,8 +589,8 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         ConDebug.Log($"Reading the save file {LoadFileName}...");
         try
         {
-            var saveDataArray = File.ReadAllBytes(LoadFileName);
-            ConDebug.Log($"Loaded on memory. ({saveDataArray.Length:n0} bytes)");
+            var saveDataArray = File.ReadAllBytes(LoadFileName);//"C:/Users/89402/AppData/LocalLow/Plus Alpha Game Studio/Black\\save5.dat"
+            ConDebug.Log($"Loaded on memory. ({saveDataArray.Length:n0} bytes) LoadFileName:{LoadFileName}");
             return MessagePackSerializer.Deserialize<BlackSaveData>(saveDataArray, Data.DefaultOptions);
         }
         catch (FileNotFoundException)
@@ -608,7 +608,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         Debug.LogErrorFormat("Load: Unknown exception thrown: {0}", exceptionList[0]);
         var t = new StackTrace();
         Debug.LogErrorFormat(t.ToString());
-        // 메인 게임 UI 요소를 모두 숨긴다. (아주 심각한 상황. 이 상태로는 무조건 게임 진행은 불가하다.)
+        // 隐藏所有主游戏UI元素。（情况非常严重。在这种状态下不能无条件进行游戏。）
         if (BlackContext.Instance.CriticalErrorHiddenCanvasList != null)
             foreach (var canvas in BlackContext.Instance.CriticalErrorHiddenCanvasList)
                 canvas.enabled = false;
@@ -621,20 +621,20 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         BlackLogManager.Add(BlackLogEntry.Type.GameCriticalError, 0, 0);
         ChangeLanguageBySystemLanguage();
         ConfirmPopup.Instance.OpenTwoButtonPopup(
-            @"\$중대한 오류 안내$"
+            @"\$重大错误通知$"
                 .Localized(), () => UploadSaveFileAsync(exceptionList, st, false),
-            () => AskAgainToReportSaveData(exceptionList, st), @"\중대한 오류 발생".Localized(), "\\예".Localized(),
-            "\\아니요".Localized());
+            () => AskAgainToReportSaveData(exceptionList, st), @"\发生重大错误".Localized(), "\\是的。".Localized(),
+            "\\没有。".Localized());
     }
 
     static void ProcessUpdateNeededError(int saveFileVersion)
     {
         ChangeLanguageBySystemLanguage();
         ConfirmPopup.Instance.Open(
-            @"\$강제 업데이트 안내$".Localized(saveFileVersion,
+            @"\$强制更新指南$".Localized(saveFileVersion,
                 LatestVersion), () =>
             {
-                // 컬러뮤지엄 앱 상세 페이지로 보낸다.
+                // 发送到彩色博物馆APP详细页面。
                 Platform.Instance.RequestUserReview();
             });
     }
@@ -668,7 +668,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
 
     public static void EnterRecoveryCode(List<Exception> exceptionList, string st, bool notCriticalError)
     {
-        ConfirmPopup.Instance.OpenInputFieldPopup("\\안내 받은 복구 코드를 입력해 주십시오.".Localized(), () =>
+        ConfirmPopup.Instance.OpenInputFieldPopup("\\请输入引导的恢复代码.".Localized(), () =>
         {
             ConfirmPopup.Instance.Close();
             ErrorReporter.Instance.ProcessRecoveryCode(exceptionList, st, ConfirmPopup.Instance.InputFieldText);
@@ -678,18 +678,18 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
                 ProcessCriticalLoadError(exceptionList, st);
             else
                 ConfirmPopup.Instance.Close();
-        }, "\\복구 코드".Localized(), Header.Normal, "", "");
+        }, "\\恢复代码".Localized(), Header.Normal, "", "");
     }
 
     static void AskAgainToReportSaveData(List<Exception> exceptionList, string st)
     {
         ConfirmPopup.Instance.OpenTwoButtonPopup(
-            @"\$업로드 불가 시 게임 진행 불가 안내$".Localized(), () =>
+            @"\$无法上传时无法进行游戏$".Localized(), () =>
             {
                 ConfigPopup.Instance.OpenCommunity();
                 ProcessCriticalLoadError(exceptionList, st);
-            }, () => EnterRecoveryCode(exceptionList, st, false), "\\중대한 오류 발생".Localized(), "\\공식 카페 이동".Localized(),
-            "\\복구 코드 입력".Localized());
+            }, () => EnterRecoveryCode(exceptionList, st, false), "\\发生重大错误".Localized(), "\\移动官网".Localized(),
+            "\\输入恢复代码".Localized());
     }
 
     static async void UploadSaveFileAsync(List<Exception> exceptionList, string st, bool notCriticalError)
@@ -766,7 +766,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         Sound.Instance.BgmAudioSourceActive = true;
         Sound.Instance.SfxAudioSourceActive = true;
 
-        // 아마 상단 노치가 필요한 모델은 하단도 필요하겠지...?
+        // 需要顶级的模型可能也需要底层的... ?
         ConfigPopup.Instance.IsBottomNotchOn = ConfigPopup.Instance.IsNotchOn;
 
         if (Application.isMobilePlatform == false)

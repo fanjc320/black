@@ -108,7 +108,7 @@ public static class DataReloader
     {
         if (xlsxList.Count == 0)
         {
-            Debug.Log("Already up-to-date.");
+            Debug.Log("ReloadDataSafe Already up-to-date.");
             return;
         }
 
@@ -127,17 +127,17 @@ public static class DataReloader
 
         foreach (var xlsx in xlsxList)
         {
-            ConDebug.Log($"Loading {xlsx}...");
+            ConDebug.Log($"ReloadDataSafe Loading {xlsx}...");
             EditorUtility.DisplayProgressBar("Reload Data", xlsx, (xlsxIndex + 1.0f) / xlsxList.Count);
             var tableList = new ExcelToObject.TableList(xlsx);
-            tableList.MapInto(dataSet);
+            tableList.MapInto(dataSet);//////
             xlsxIndex++;
 
             Xlsx2Csv20.Xlsx2Csv.Convert(xlsx,
                 Path.Combine(csvForDiffPath, Path.GetFileNameWithoutExtension(xlsx) + ".csv"));
         }
 
-        // 번역되는 텍스트는 diff를 쉽게 볼 수 있도록 텍스트파일로도 쓴다.
+        // 翻译后的文本也被写入文本文件，以便可以轻松查看差异。
         WriteStringDataToTextFile(Path.Combine("Data", "StrKoData.txt"), dataSet.StrKoData, true, 0.2f);
         WriteStringDataToTextFile(Path.Combine("Data", "StrEnData.txt"), dataSet.StrEnData, true, 1.0f);
 
@@ -183,8 +183,8 @@ public static class DataReloader
         var hashMsgPackDataPath = "Assets/Resources/Data/Hash-MsgPack.bytes";
         var dataSetHash = new DataSetHash
             {Hash = fullXlsxList.Select(e => new[] {e, CalculateMd5(e)}).ToDictionary(e => e[0], e => e[1])};
-        var hashSerialized = Data.SerializeDataSetWithComparison(dataSetHash);
-        File.WriteAllBytes(hashMsgPackDataPath, hashSerialized);
+        var hashSerialized = Data.SerializeDataSetWithComparison(dataSetHash);//{DataSetHash}
+        File.WriteAllBytes(hashMsgPackDataPath, hashSerialized);//"Assets/Resources/Data/Hash-MsgPack.bytes",
 
         var blackMsgPackDataPath = "Assets/Resources/Data/Black-MsgPack.bytes";
         BlackStringTable.StringNumberDict.Clear();

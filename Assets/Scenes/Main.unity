@@ -14904,6 +14904,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Shared Context
       objectReference: {fileID: 0}
+    - target: {fileID: 2425384019352460545, guid: 22c09a1e55a5aad4b8aa2fdae2916a1c,
+        type: 3}
+      propertyPath: CurrentLanguageCode
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22c09a1e55a5aad4b8aa2fdae2916a1c, type: 3}
 --- !u!1001 &2972894473697718067

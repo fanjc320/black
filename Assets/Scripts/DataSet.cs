@@ -22,7 +22,7 @@ public class DataSet
     public Dictionary<ScString, StrBaseData> StrKoData; // 한국어
     public Dictionary<ScString, StrBaseData> StrTwData; // 중국어 (번체)
 
-    // 이하의 데이터는 런타임에 정해진다.
+    // 以下数据是在运行时确定的。
     [IgnoreMember]
     public Dictionary<string, IResourceLocation> StageMetadataLocDict;
 

@@ -77,7 +77,7 @@ public class IslandShaderController : MonoBehaviour
 
     void IncreaseIslandIndex()
     {
-        islandIndex = (islandIndex + 1) % (1 + stageData.islandDataByMinPoint.Count); // 첫 번째 섬은 언제나 외곽선 전용이다.
+        islandIndex = (islandIndex + 1) % (1 + stageData.islandDataByMinPoint.Count); // 第一个岛始终只有轮廓.
         rawImage.material.SetInt(IslandIndex, islandIndex);
     }
 }

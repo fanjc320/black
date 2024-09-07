@@ -63,7 +63,7 @@ public class IslandLabelSpawner : MonoBehaviour
             if (rectIndex % subgroupCapacity == 0)
             {
                 islandLabelNumberSubgroup =
-                    new GameObject($"Island Label Subgroup ({rectIndex:d4}-{rectIndex + subgroupCapacity - 1:d4})");
+                    new GameObject($"Island Label Subgroup ({rectIndex:d4}-{rectIndex + subgroupCapacity - 1:d4})");//"Island Label Subgroup (0000-0049) (UnityEngine.GameObject)"
                 islandLabelNumberSubgroup.transform.parent = islandLabelNumberGroup;
                 var subGroupRt = islandLabelNumberSubgroup.AddComponent<RectTransform>();//"Island Label Subgroup (0000-0049) (UnityEngine.RectTransform)"
                 subGroupRt.anchoredPosition3D = Vector3.zero;

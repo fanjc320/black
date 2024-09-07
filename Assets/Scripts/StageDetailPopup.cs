@@ -89,7 +89,8 @@ public class StageDetailPopup : MonoBehaviour
         // 最后清除的 ID 是从 1 开始的，下面的函数是从 0 开始操作的。
         // 当您检索下一个要播放的舞台时，只需按原样传递 ID 即可。
         //var stageMetadata = await LoadStageMetadataByZeroBasedIndexAsync(stageIndex);
-        var stageMetadata = await LoadStageMetadataByZeroBasedIndexAsync(46);
+        Debug.Log($"OpenPopupAfterLoadingAsync stageIndex:{stageIndex}");
+        var stageMetadata = await LoadStageMetadataByZeroBasedIndexAsync(50);
 
         if (stageMetadata == null)
         {
@@ -158,14 +159,14 @@ public class StageDetailPopup : MonoBehaviour
         }
     }
 
-    public static async Task<StageMetadata> LoadStageMetadataByZeroBasedIndexAsync(ScInt zeroBasedIndex)
+    public static async Task<StageMetadata> LoadStageMetadataByZeroBasedIndexAsync(ScInt zeroBasedIndex)//46
     {
         if (zeroBasedIndex < 0 || zeroBasedIndex >= Data.dataSet.StageMetadataLocList.Count)
         {
-            Debug.LogError($"Stage index {zeroBasedIndex} (zero-based) is out of range");
+            Debug.LogError($"Stage index {zeroBasedIndex} (zero-based) is out of range count:{Data.dataSet.StageMetadataLocList.Count}");
             return null;
         }
-        
+        Debug.Log($"LoadStageMetadataByZeroBasedIndexAsync Stage index zeroBasedIndex: {zeroBasedIndex} (zero-based) is out of range");
         var stageMetadataLoc = Data.dataSet.StageMetadataLocList[zeroBasedIndex];
         if (stageMetadataLoc == null)
         {

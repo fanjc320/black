@@ -116,7 +116,8 @@ public class FontManager : MonoBehaviour
     {
         if (strBaseData == null)
         {
-            ConDebug.LogError("LookupLocalizedDictionary strBaseData null!", context);
+            //ConDebug.LogError("LookupLocalizedDictionary key:{key} strBaseData null!", context +" key:"+ key+ " index:"+ index + " strRef:" + strRef + " languageCode:" + languageCode);
+            ConDebug.LogError($"LookupLocalizedDictionary key:{key} index:{index} strRef:{strRef} languageCode:{languageCode} strBaseData null!", context);
         }
         else
         {

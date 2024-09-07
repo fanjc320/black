@@ -53,7 +53,7 @@ public class StageSaveManager : MonoBehaviour
         File.Delete(wipPngPath);
     }
 
-    public static StageSaveData Load(string stageName)
+    public static StageSaveData Load(string stageName)//"047"
     {
         try
         {

@@ -425,8 +425,8 @@ public class ConfigPopup : MonoBehaviour
         if (languageDropdown != null) languageDropdown.value = GetLanguageIndex(languageCode);
     }
 
-    // Dropdown 콜백으로만 호출되어야 한다.
-    // 직접 호출하면 안된다.
+    // 它只能通过 Dropdown 回调来调用。
+    // 不应该直接调用。
     public void OnLanguageValueChanged(int languageIndex)
     {
         ConDebug.Log($"Language selected: {languageIndex}");
@@ -506,7 +506,7 @@ public class ConfigPopup : MonoBehaviour
 
     void UpdateEtcGroupVisibility()
     {
-        // 시스템 언어가 한국어인 경우 혹은 치트 모드에서만 기타 그룹 버튼(응급 서비스 확인, 카페 가기, ...) 보여준다.
+        // 其他组按钮（检查紧急服务、去咖啡馆等）仅在系统语言为韩语或处于作弊模式时显示。
         foreach (var btn in configButtonGroupEtc) btn.gameObject.SetActive(EtcGroupVisible);
     }
 
@@ -583,11 +583,11 @@ public class ConfigPopup : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == "Lobby")
         {
-            ConfirmPopup.Instance.Open("여기가 미술관 화면입니다.");
+            ConfirmPopup.Instance.Open("这是博物馆的屏幕.");
         }
         else
         {
-            ConfirmPopup.Instance.OpenYesNoPopup("미술관 화면으로 돌아가시겠습니까?\n스테이지 진행 상태는 저장됩니다.",
+            ConfirmPopup.Instance.OpenYesNoPopup("您想返回博物馆屏幕吗？\n阶段进度将被保存。.",
                 () => { MainGame.Instance.GoToLobby(); }, ConfirmPopup.Instance.Close);
         }
     }
@@ -598,11 +598,11 @@ public class ConfigPopup : MonoBehaviour
         
         if (SceneManager.GetActiveScene().name == "Lobby")
         {
-            ConfirmPopup.Instance.Open("스테이지 진행 중이 아닙니다.");
+            ConfirmPopup.Instance.Open("阶段尚未进行.");
         }
         else
         {
-            ConfirmPopup.Instance.OpenYesNoPopup("현재 스테이지를 다시 시작하겠습니까?\n제한 시간도 초기화됩니다.",
+            ConfirmPopup.Instance.OpenYesNoPopup("您想重新开始当前阶段吗？\n时间限制也将被重置。.",
                 () => { MainGame.Instance.ResetStage(); }, ConfirmPopup.Instance.Close);
         }
     }

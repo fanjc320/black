@@ -14,6 +14,7 @@ using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using Color = SixLabors.ImageSharp.Color;
 using Vector4 = System.Numerics.Vector4;
+using NUnit.Framework.Internal;
 #if UNITY_2020_1_OR_NEWER
 using Math = UnityEngine.Mathf;
 
@@ -44,8 +45,8 @@ namespace black_dev_tools
                 Logger.WriteErrorLine("Should provide at least one param: mode");
                 return;
             }
-
             var mode = args[0];
+            Logger.WriteLine($"args0: {mode}");
 
             if (mode == "batch")
                 ProcessMultipleFiles(args);
@@ -87,6 +88,7 @@ namespace black_dev_tools
             if (args.Length >= 4) outputPathReplaceTo = args[3];
 
             var bbFileName = ExecuteBoxBlur(sourceFileName, 2);
+            Logger.WriteLine($"ExecuteBoxBlur sourceFileName: {sourceFileName} bbFileName:{bbFileName}");
             ExecuteSdf(bbFileName);
         }
 
@@ -214,7 +216,8 @@ namespace black_dev_tools
             if (args.Length >= 5) outputPathReplaceTo = args[4];
 
             outputNewFileName = args.Length >= 6 ? args[5] : null;
-
+            Logger.WriteLine(
+                    $"ProcessSingleFile mode:{mode}");
             if (mode == "otb")
             {
                 ExecuteOutlineToBlack(startFileName, outlineThreshold);
@@ -253,26 +256,30 @@ namespace black_dev_tools
                 var fotsFileName = ExecuteFlattenedOutlineToSource(qFileName, fsnbFileName);
                 var bytesFileName = ExecuteDetermineIsland(fotsFileName, rasapFileName);
 
-                // 색칠 테스트. 첫 데이터를 얻기 위한 것으로 오류 메시지는 경고로 무시해도 된다.
+                // 着色测试。这是为了获取第一个数据，错误消息可以作为警告忽略。
                 var ditFileName = ExecuteDetermineIslandTest(fsnbFileName, bytesFileName, true, false);
 
-                // DIT 파일이 최종 컬러링 완성 시의 이미지이다. 이걸로 최종적으로 데이터를 다시 뽑는다.
+                // DIT文件是最终着色完成时的图像。至此，数据终于再次被提取出来。
                 bytesFileName = ExecuteDetermineIsland(ditFileName, rasapFileName);
 
-                //두 번째 테스트. 여기서 오류가 나면 뭔가 이상한거다.
+                //第二次测试。如果这里出现错误，那就很奇怪了。
                 ExecuteDetermineIslandTest(fsnbFileName, bytesFileName, false, true);
 
                 var bbFileName = ExecuteBoxBlur(fsnbFileName, 1);
                 ExecuteSdf(bbFileName);
 
-                // 필요없는 파일은 삭제한다.
-                // 디버그가 필요한 경우 삭제하지 않고 살펴보면 된다.
-//                if (rasapFileName != startFileName)
-//                {
-//                    File.Delete(rasapFileName);
-//                }
+                // 删除不需要的文件。
+                // 如果需要调试就看一下，不用删除。
+                //                if (rasapFileName != startFileName)
+                //                {
+                //                    File.Delete(rasapFileName);
+                //                }
 
                 var artifactsDirName = Path.GetDirectoryName(ChangeToArtifactsPath(bbFileName));
+                //ProcessSingleFile files  rasapFileName: Assets\Stages\051\051.png otbFileName: Assets\Stages\051\051 - OTB.png
+                ////fsnbFileName: Assets\Stages\051\051 - OTB - FSNB.png qFileName: Assets\Stages\051\051 - Q.png fotsFileName: Assets\Stages\051\051 - OTB - FSNB - FOTS.png 
+                ///bytesFileName: Assets\Stages\051\051.bytes bbFileName: Assets\Stages\051\051 - OTB - FSNB - BB.png
+                Logger.WriteLine($"ProcessSingleFile files  rasapFileName:{rasapFileName} otbFileName:{otbFileName} fsnbFileName:{fsnbFileName} qFileName:{qFileName} fotsFileName:{fotsFileName} bytesFileName:{bytesFileName} bbFileName:{bbFileName}");
                 if (string.IsNullOrEmpty(artifactsDirName))
                 {
                     throw  new ArgumentNullException();
@@ -333,11 +340,11 @@ namespace black_dev_tools
             return Path.Combine(dirName, "Artifacts~", Path.GetFileName(path));
         }
 
-        // 섬 데이터와 외곽선 데이터를 이용해 색칠을 자동으로 해 본다.
-        // 색칠 후 이미지에 문제가 없는지 확인하기 위한 테스트 과정이다.
+        // 使用岛数据和轮廓数据自动进行着色。
+        // 这是一个测试过程，检查着色后的图像是否有问题。
         static string ExecuteDetermineIslandTest(string sourceFileName, string bytesFileName, bool errorAsWarning, bool writeA1A2Tex)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteDetermineIslandTest)}");
+            Logger.WriteLine($"ExecuteDetermineIslandTest Running {nameof(ExecuteDetermineIslandTest)}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-DIT");
             var a1TexFileName = AppendToFileName(targetFileName, "-A1");
@@ -363,7 +370,7 @@ namespace black_dev_tools
             var colorUintDict = new Dictionary<uint, int>();
             for (var i = 0; i < colorUintArray.Length; i++)
             {
-                colorUintDict[colorUintArray[i]] = i + 1; // Palette Index 0은 외곽선 용으로 예비한다.
+                colorUintDict[colorUintArray[i]] = i + 1; // Palette Index 0为大纲保留。
             }
 
             using (var image = Image.Load<Rgba32>(sourceFileName))
@@ -371,10 +378,10 @@ namespace black_dev_tools
                 var a1Tex = new Image<Rgba32>(image.Width, image.Height, AllZeros);
                 var a2Tex = new Image<Rgba32>(image.Width, image.Height, AllZeros);
 
-                var islandIndex = 1; // Island Index 0은 외곽선 용으로 예비한다.
-                
-                // dictionary의 이터레이션 순서에 의존하면 안되고, island data에서 지정한 index 순서로 하자.
-                foreach (var island in stageData.islandDataByMinPoint.OrderBy(e => e.Value.index))
+                var islandIndex = 1; // Island Index 0为大纲保留。
+
+                // 您不应依赖于字典的迭代顺序，而应使用岛数据中指定的索引顺序。
+                foreach (var island in stageData.islandDataByMinPoint.OrderBy(e => e.Value.index))//!!!!!!!
                 {
                     var minPoint = UInt32ToVector2Int(island.Key);
                     var targetColor = UInt32ToRgba32(island.Value.rgba);
@@ -386,12 +393,12 @@ namespace black_dev_tools
                             a1Tex[fx, fy] = new Rgba32 {A = a1};
                             a2Tex[fx, fy] = new Rgba32 {A = a2};
                         });
-
+                    Logger.WriteLine($"ExecuteDetermineIslandTest foreach key:{island.Key} targetCol:{targetColor} paletteIndex:{paletteIndex}");
                     if (fillMinPoint == new Vector2Int(image.Width, image.Height))
                     {
                         if (errorAsWarning)
                         {
-                            // 이번엔 오류로 안친다.
+                            // 这次不会导致错误。
                             Logger.WriteLine("Logic error in ExecuteDetermineIslandTest()! Invalid fillMinPoint");
                         }
                         else
@@ -404,7 +411,7 @@ namespace black_dev_tools
                     {
                         if (errorAsWarning)
                         {
-                            // 이번엔 오류로 안친다.
+                            // 这次不会导致错误。
                             Logger.WriteLine(
                                 $"Logic error in ExecuteDetermineIslandTest()! Pixel area {pixelArea} expected to be {island.Value.pixelArea}");
                         }
@@ -443,8 +450,8 @@ namespace black_dev_tools
             return targetFileName;
         }
 
-        // paletteIndex에 6-bit -> 최대 64개 팔레트
-        // islandIndex에 10-bit -> 최대 1024개 섬
+        // paletteIndex到 6-bit -> 最多 64 个托盘
+        // islandIndex到 10-bit -> 多达1024个岛屿
         static void GetAlpha8Pair(int islandIndex, int paletteIndex, out byte a1, out byte a2)
         {
             if (islandIndex <= 0 || islandIndex >= (2 << 9))
@@ -461,29 +468,30 @@ namespace black_dev_tools
             a2 = (byte) (islandIndex >> 2);
         }
 
-        // 입력 이미지로 섬 데이터를 만든다.
-        // 섬 데이터는 유니티에서 사용하게 된다.
+        // 从输入图像创建岛屿数据。
+        // 岛屿数据将在 Unity 中使用。
         static string ExecuteDetermineIsland(string sourceFileName, string startFileName)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteDetermineIsland)}");
+            //ExecuteDetermineIsland Running ExecuteDetermineIsland sourceFileName:Assets\Stages\test\test - OTB - FSNB - FOTS.png startFileName: Assets\Stages\test\test.png
+            Logger.WriteLine($"ExecuteDetermineIsland Running {nameof(ExecuteDetermineIsland)} sourceFileName:{sourceFileName} startFileName:{startFileName}");
 
-            // 이미지 파일을 열어봅시다~
+            // 我们打开图片文件吧
             using (var image = Image.Load<Rgba32>(sourceFileName))
             {
-                // 색상 별 픽셀 수
+                // 每种颜色的像素数
                 var pixelCountByColor = new Dictionary<Rgba32, int>();
-                // Min Point 별 (섬 별) 섬 색상
+                // Min Point Star(岛星)岛色
                 var islandColorByMinPoint = new Dictionary<Vector2Int, Rgba32>();
-                // Min Point 별 (섬 별) 섬 픽셀 수(면적)
+                // Min Point 按岛屿（按岛屿） 岛屿像素数（面积）
                 var islandPixelAreaByMinPoint = new Dictionary<Vector2Int, int>();
-                // 색상 별 섬 수
+                // 按颜色划分的岛屿数量
                 var islandCountByColor = new Dictionary<Rgba32, int>();
-                // 픽셀 수(면적) 별 섬 수
+                // 岛屿数量（按像素数（面积）计算）
                 var islandCountByPixelArea = new Dictionary<int, int>();
-                // Min Point 별 (섬 별) Max Rect
+                // Min Point 星（岛星） Max Rect
                 var maxRectByMinPoint = new Dictionary<uint, ulong>();
 
-                // 각 픽셀에 대해서 반복한다.
+                // 对每个像素重复此操作。
                 for (var h = 0; h < image.Height; h++)
                 for (var w = 0; w < image.Width; w++)
                 {
@@ -491,23 +499,24 @@ namespace black_dev_tools
 
                     if (pixelColor == Black)
                     {
-                        // 경계선 색상(검은색)이면 할 일이 없다.
+                        // 如果边框颜色为黑色，则无需执行任何操作
                     }
                     else
                     {
-                        // (w, h) 좌표부터 검은색이 아닌 색을 검은색으로 채우면서 픽셀 수집한다.
-                        // 수집한 모든 픽셀은 points에, points의 min point는 반환값으로 받는다.
-                        var coord = new Vector2Int(w, h);
-                        var fillMinPoint = FloodFill.ExecuteFillIfNotBlack(image, coord, Black, out var pixelArea,
+                            // (w, h) 从坐标开始，通过用黑色填充非黑色来收集像素
+                            // 收集到的每个像素是 points到, points的 min point作为返回值被接收。.
+                            var coord = new Vector2Int(w, h);
+                            var fillMinPoint = FloodFill.ExecuteFillIfNotBlack(image, coord, Black, out var pixelArea,
                             out var points, out var originalColors);
+                            Logger.WriteLine($"ExecuteDetermineIsland fillMinPoint:{fillMinPoint} sourceFileName:{sourceFileName} startFileName:{startFileName} image:{image} coord:{coord} pixelArea:{pixelArea}");
                         if (fillMinPoint != new Vector2Int(image.Width, image.Height))
                         {
                             if (originalColors.Count > 1)
                             {
-                                // 한 섬에 색상이 여러 가지라면 가장 많은 색상이 최종 색깔이 되도록 하자.
-                                // 주로 경계선 주변에서 경계선과 섬 색깔이 블렌딩되면서 다른 색깔이 되는 패턴이다.
-                                //var prominentColor = originalColors.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-                                var prominentColor = originalColors.OrderByDescending(e => e.Value)
+                                    // 如果一个岛上有多种颜色，则将颜色最多的颜色作为最终颜色。
+                                    // 这是一种图案，其中边框和岛屿颜色混合在一起以创建不同的颜色，主要是在边框周围。
+                                    //var prominentColor = originalColors.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+                                    var prominentColor = originalColors.OrderByDescending(e => e.Value)
                                     .First(e => e.Key != White).Key;
 
                                 pixelColor = prominentColor;
@@ -533,6 +542,7 @@ namespace black_dev_tools
                             var xMin = points.Min(e => e.x);
                             var yMax = points.Max(e => e.y);
                             var yMin = points.Min(e => e.y);
+                            Logger.WriteLine($"ExecuteDetermineIsland fillMinPoint: {fillMinPoint} pixelColor:{pixelColor} pixelArea:{pixelArea} points:{points}");
                             var subRectW = xMax - xMin + 1;
                             var subRectH = yMax - yMin + 1;
                             var A = Enumerable.Range(0, subRectH).Select(e => new int[subRectW]).ToArray();
@@ -561,7 +571,7 @@ namespace black_dev_tools
 
                 if (islandColorByMinPoint.Count < 1) throw new IslandCountException();
 
-                var islandIndex = 1; // 0번째 island는 외곽선을 위해 예비한 값이다.
+                var islandIndex = 1; // 0第二个岛是为轮廓保留的值。
                 foreach (var kv in islandColorByMinPoint.OrderBy(kv => Vector2IntToUInt32(kv.Key)))
                 {
                     Logger.WriteLine(
@@ -569,7 +579,7 @@ namespace black_dev_tools
                     islandIndex++;
                 }
 
-                var colorCountIndex = 1; // 0 번째 컬러는 외곽선을 위해 예비한 블랙 값이다.
+                var colorCountIndex = 1; // 0 第二种颜色是为轮廓保留的黑色值。
                 foreach (var kv in pixelCountByColor)
                 {
                     islandCountByColor.TryGetValue(kv.Key, out var islandCount);
@@ -620,11 +630,11 @@ namespace black_dev_tools
             }
         }
 
-        // 이미지를 팔레트화시킨다.
-        // 팔레트에는 반드시 검은색과 흰색은 빠지도록 한다.
+        // 对图像进行调色板。
+        // 确保从调色板中排除黑色和白色。
         static string ExecuteQuantize(string sourceFileName, int maxColor = 30)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteQuantize)}");
+            Logger.WriteLine($"ExecuteQuantize Running {nameof(ExecuteQuantize)}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-Q");
 
@@ -642,7 +652,7 @@ namespace black_dev_tools
                 foreach (var p in quantizedResult.Palette.Span)
                 {
                     var c = new Color(p);
-                    // 팔레트에 흰색과 검은색은 반드시 빠지도록 한다.
+                    // 请务必从调色板中排除白色和黑色。
                     if (c != Color.White && c != Color.Black) quantizedPalette.Add(c);
                 }
 
@@ -661,10 +671,10 @@ namespace black_dev_tools
             }
         }
 
-        // sourceFileName 위에 outlineFileName을 얹는다. 얹을 때 완전 검은 색깔만 얹는다.
+        // sourceFileName 多于outlineFileName穿上它。佩戴时，只能使用全黑色。
         static string ExecuteFlattenedOutlineToSource(string sourceFileName, string outlineFileName)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteFlattenedOutlineToSource)}");
+            Logger.WriteLine($"ExecuteFlattenedOutlineToSource Running {nameof(ExecuteFlattenedOutlineToSource)}");
 
             var targetFileName = AppendToFileName(outlineFileName, "-FOTS");
             using (var sourceImage = Image.Load<Rgba32>(sourceFileName))
@@ -690,14 +700,14 @@ namespace black_dev_tools
             return targetFileName;
         }
 
-        // 너무 큰 이미지를 작은 이미지로 줄이면서 PNG 파일이 아니면 PNG로 바꾼다.
+        // 将太大的图像缩小为较小的图像，如果不是 PNG 文件，则将其转换为 PNG。
         static string ExecuteResizeAndSaveAsPng(string sourceFileName, int threshold)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteResizeAndSaveAsPng)}");
+            Logger.WriteLine($"ExecuteResizeAndSaveAsPng Running {nameof(ExecuteResizeAndSaveAsPng)}");
 
             using var image = Image.Load<Rgba32>(sourceFileName);
 
-            // 정사각형이 아니라면 우선 큰 변 기준으로 정사각형으로 만든다. (여백 추가)
+            // 如果不是正方形，则先根据最大边将其制成正方形。 （添加保证金）
             if (image.Width != image.Height)
             {
                 var maxSide = Math.Max(image.Width, image.Height);
@@ -728,10 +738,10 @@ namespace black_dev_tools
             return targetFileName;
         }
 
-        // 애매한 검은색을 완전한 검은색으로 바꾼다.
+        // 将模糊的黑色变为完全的黑色-OTB
         static string ExecuteOutlineToBlack(string sourceFileName, int threshold)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteOutlineToBlack)}");
+            Logger.WriteLine($"ExecuteOutlineToBlack Running {nameof(ExecuteOutlineToBlack)}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-OTB");
             using (var image = Image.Load<Rgba32>(sourceFileName))
@@ -748,14 +758,14 @@ namespace black_dev_tools
                     var y = 0.2126f * r + 0.7152f * g + 0.0722f * b;
                     if (y < threshold / 255.0f)
                     {
-                        var ss = 0;
-                        // 7x7 윈도우로 모두 검은색 만들기
-                        for (var hh = -ss; hh <= ss; hh++)
-                        for (var ww = -ss; ww <= ss; ww++)
-                        {
-                            SetPixelClamped(newImage, w + ww, h + hh, Black);
+                            var ss = 0;
+                            // 7x7 使用 Windows 将一切变为黑色
+                            for (var hh = -ss; hh <= ss; hh++)
+                                for (var ww = -ss; ww <= ss; ww++)
+                                {
+                                    SetPixelClamped(newImage, w + ww, h + hh, Black);
+                                }
                         }
-                    }
                     else
                     {
                         newImage[w, h] = White;
@@ -803,30 +813,30 @@ namespace black_dev_tools
             return r;
         }
 
-        // 아주 작은 비검은색을 검은색으로 메운다.
+        // 用黑色填充最小的非黑色空间。-FSNB
         static string ExecuteFillSmallNotBlack(string sourceFileName, int threshold = 4 * 4 * 4)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteFillSmallNotBlack)}");
+            Logger.WriteLine($"Running {nameof(ExecuteFillSmallNotBlack)}  sourceFileName:{sourceFileName}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-FSNB");
-            // Min Point 별 (섬 별) 섬 픽셀 수(면적)
+            // Min Point按岛屿（按岛屿） 岛屿像素数（面积）
             var islandPixelAreaByMinPoint = new Dictionary<Vector2Int, int>();
             using (var image = Image.Load<Rgba32>(sourceFileName))
             {
-                // 각 픽셀에 대해서 반복한다.
+                // 对每个像素重复此操作。
                 for (var h = 0; h < image.Height; h++)
                 for (var w = 0; w < image.Width; w++)
                 {
                     var pixelColor = image[w, h];
                     if (pixelColor == Black)
                     {
-                        // 경계선 색상(검은색)이면 할 일이 없다.
-                    }
-                    else
+                            // 如果边框颜色为黑色，则无需执行任何操作
+                        }
+                        else
                     {
-                        // (w, h) 좌표부터 검은색이 아닌 색을 검은색으로 채우면서 픽셀 수집한다.
-                        // 수집한 모든 픽셀은 points에, points의 min point는 반환값으로 받는다.
-                        var coord = new Vector2Int(w, h);
+                            // (w, h) 从坐标开始，通过用黑色填充非黑色来收集像素。
+                            // 收集到的每个像素是 points到, points的 min point作为返回值被接收。
+                            var coord = new Vector2Int(w, h);
                         var fillMinPoint = FloodFill.ExecuteFillIfNotBlack(image, coord, Black, out var pixelArea,
                             out _, out _);
                         if (fillMinPoint != new Vector2Int(image.Width, image.Height))
@@ -837,8 +847,8 @@ namespace black_dev_tools
                 }
             }
 
-            // 메모리상 image 변수는 직전 과정에서 변경되었으므로, 다시 읽어들이자.
-            // 여기서부터 본격적으로 작은 비검정색칸을 검정색칸으로 채운다.
+            // 之前的过程中内存中的image变量被改变了，所以重新读取一下。
+            // 从这里开始，小的非黑色单元格被黑色单元格填充。
             using (var image = Image.Load<Rgba32>(sourceFileName))
             {
                 foreach (var island in islandPixelAreaByMinPoint)
@@ -855,7 +865,7 @@ namespace black_dev_tools
                         }
                     }
 
-                // 그리고 저장!
+                // 并保存！
                 var targetDirName = Path.GetDirectoryName(targetFileName);
                 if (string.IsNullOrEmpty(targetDirName)) return string.Empty;
 

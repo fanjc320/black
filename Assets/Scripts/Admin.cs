@@ -104,8 +104,8 @@ public class Admin : MonoBehaviour
     public void TestVibrate()
     {
 #if DEV_BUILD && (UNITY_ANDROID || UNITY_IOS)
-        // VIBRATE 속성을 AndroidManifest.xml에 들어가게 하도록 하기 위해...
-        // (노티피케이션에서 필요한 권한임)
+        // 为了在 AndroidManifest.xml 中包含 VIBRATE 属性...
+        //（通知需要许可）
         Handheld.Vibrate();
 #endif
     }
@@ -187,7 +187,7 @@ public class Admin : MonoBehaviour
 
     public void ShowSavedGameSelectUI()
     {
-        // 유저용 응급 기능이다. DEV_BUILD으로 감싸지 말것.
+        // 这是用户的紧急功能。不要将其包装在 DEV_BUILD 中。
         GameObject.Find("Platform After Login").GetComponent<PlatformAfterLogin>().ShowSavedGameSelectUI();
     }
 
@@ -203,9 +203,9 @@ public class Admin : MonoBehaviour
 #if DEV_BUILD
         CloseAdminMenu();
 
-        // 자동 테스트 전체는 'blackTester.StartTest()'를 호출해서 시작된다.
-        // 다만 테스트 과정을 개발하는 동안에는 각 부분에 대한 테스트를 빠르게 하기 위해서
-        // 그 이하의 각 테스트 부분의 StartCoroutine을 수동으로 호출해가며 확인한다.
+        // 整个自动化测试是通过调用“blackTester.StartTest()”启动的。
+        // 但是，在开发测试流程的同时，为了加快各个部分的测试速度，
+        // 通过手动调用下面每个测试部分的 StartCoroutine 进行检查。
 
         var blackTesterLoaded = SceneManager.GetSceneByName("Black Tester").isLoaded;
         if (blackTesterLoaded == false) SceneManager.LoadScene("Black Tester", LoadSceneMode.Additive);
@@ -231,10 +231,10 @@ public class Admin : MonoBehaviour
         }
         else
         {
-            // 실 기기에서 다른 유저 데이터를 받아버리면, 치트 플래그가 올라가지 않은 상태로
-            // 플레이하게 되는 것으로써, 리더보드/업적 등 진행 상황이 개발자 실기기 연동 계정에
-            // 반영이 되게 된다. 이에 대한 방지책을 마련하기 전까지는 이 기능은 개발 컴퓨터에서만
-            // 작동되도록 한다.
+            //如果从实际设备接收到其他用户数据，则不会引发作弊标志。
+            // 当您玩游戏时，排行榜/成就等进度将记录在开发者的实际设备关联帐户中。
+            // 已反映。在采取预防措施之前，此功能将仅在开发计算机上可用。
+            // 让它工作。
             ShortMessage.Instance.Show("Only supported in Editor", true);
         }
 #endif
@@ -243,7 +243,7 @@ public class Admin : MonoBehaviour
     public void ChangeLanguage()
     {
 #if DEV_BUILD
-        //한국어 -> 일본어 -> 중국어 (간체) -> 중국어 (번체) -> 한국어 ... (반복)
+        //韩语->日语->中文（简体） -> 中文（繁体） -> 韩语...（重复）
 
         var text = changeButton.GetComponentInChildren<Text>();
         switch (Data.Instance.CurrentLanguageCode)
@@ -268,11 +268,11 @@ public class Admin : MonoBehaviour
 #endif
     }
 
-    // 일단 메인 플레이가 되는 상황에서 유저가 저장 데이터를 개발팀에게 제출하고 싶은 경우 쓰는 메뉴
+    // 当用户想要在主要游戏期间向开发团队提交保存的数据时使用的菜单
     public async void ReportSaveDataAsync()
     {
-        // 유저용 응급 기능이다. DEV_BUILD으로 감싸지 말것.
-        // 저장 한번 하고
+        // 这是用户的紧急功能。不要将其包装在 DEV_BUILD 中。
+        // 保存一次
 
         StageSaveData stageSaveData = null;
 
@@ -332,7 +332,7 @@ public class Admin : MonoBehaviour
         }
         
         SaveLoadManager.Save(BlackContext.Instance, ConfigPopup.Instance, Sound.Instance, Data.Instance, stageSaveData);
-        // 제출 시작한다.
+        // 提交开始。
         await ErrorReporter.Instance.UploadSaveFileIncidentAsync(new List<Exception>(), "NO CRITICAL ERROR",
             true);
     }

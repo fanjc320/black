@@ -1,7 +1,9 @@
 #if IMAGESHARP
 using System.Collections.Generic;
+using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UnityEngine;
 
 namespace black_dev_tools
 {
@@ -49,7 +51,7 @@ namespace black_dev_tools
             while (q.Count > 0)
             {
                 var n = q.Dequeue();
-                // targetColor가 아니면 스킵한다.
+                // targetColor否则，跳过它。
                 if (ColorMatch(GetPixel(bitmap, n.x, n.y), targetColor) == false) continue;
                 Vector2Int w = n, e = new Vector2Int(n.x + 1, n.y);
                 while (w.x >= 0 && ColorMatch(GetPixel(bitmap, w.x, w.y), targetColor))
@@ -94,7 +96,7 @@ namespace black_dev_tools
             while (q.Count > 0)
             {
                 var n = q.Dequeue();
-                // 검은색이 아닌게 아니면(즉, 검은색이면) 스킵한다.
+                // 跳过，除非它是黑色的（即如果它是黑色的）.
                 if (ColorIsNotBlack(GetPixel(bitmap, n.x, n.y)) == false) continue;
                 Vector2Int w = n, e = new Vector2Int(n.x + 1, n.y);
                 while (w.x >= 0 && ColorIsNotBlack(GetPixel(bitmap, w.x, w.y)))
@@ -102,6 +104,7 @@ namespace black_dev_tools
                     var oldColor = SetPixel(bitmap, w.x, w.y, replacementColor);
                     Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                     UpdateFillMinPoint(ref fillMinPoint, w);
+                    //Logger.WriteLine($"ExecuteFillIfNotBlack oldColor:{oldColor} originalColors:{originalColors} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
                     points.Add(w);
                     pixelArea++;
                     if (w.y > 0 && ColorIsNotBlack(GetPixel(bitmap, w.x, w.y - 1)))
@@ -208,3 +211,8 @@ namespace black_dev_tools
     }
 }
 #endif
+
+
+//算法介绍 | 泛洪算法（Flood fill Algorithm）
+//https://blog.csdn.net/Eason_Y/article/details/127782837
+//这里的floodfill算法感觉能根据这个链接简化

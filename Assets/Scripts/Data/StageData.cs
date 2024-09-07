@@ -5,10 +5,10 @@ using System.Linq;
 [Serializable]
 public class StageData
 {
-    // 색상 별 섬 수
+    // 按颜色划分的岛屿数量
     public Dictionary<uint, int> islandCountByColor = new Dictionary<uint, int>();
 
-    // Min Point 별 섬 데이터
+    // Min Point 星岛数据
     public Dictionary<uint, IslandData> islandDataByMinPoint = new Dictionary<uint, IslandData>();
 
     List<MinPointIslandData> cachedIslandDataList;

@@ -76,7 +76,7 @@ public class MainGame : MonoBehaviour
         // 如果你是从Lobby神那里过来的，你会满足这个条件的。
         if (StageButton.CurrentStageMetadata != null)
         {
-            stageMetadata = StageButton.CurrentStageMetadata;
+            stageMetadata = StageButton.CurrentStageMetadata;//"047 (StageMetadata)"
 
             if (Verbose)
             {
@@ -92,10 +92,12 @@ public class MainGame : MonoBehaviour
                 await Task.Yield();
             }
             //StageMetadataLocList[47] "Assets/Stages/001/001.asset"-"Assets/Stages/047/047.asset"
-            stageMetadata = await Addressables.LoadAssetAsync<StageMetadata>(Data.dataSet.StageMetadataLocList[0]).Task;
+            //stageMetadata = await Addressables.LoadAssetAsync<StageMetadata>(Data.dataSet.StageMetadataLocList[0]).Task;
+            ConDebug.Log($"MainGame Start StageMetadataLocList.Count: {Data.dataSet.StageMetadataLocList.Count()}");
+            stageMetadata = await Addressables.LoadAssetAsync<StageMetadata>(Data.dataSet.StageMetadataLocList[50]).Task;
 #endif
         }
-
+        ConDebug.Log($"MainGame Start Stage metadata specified by StageButton: {stageMetadata.name}");
         using (var stream = new MemoryStream(stageMetadata.RawStageData.bytes))
         {
             var formatter = new BinaryFormatter();
@@ -128,10 +130,10 @@ public class MainGame : MonoBehaviour
 
         gridWorld.LoadTexture(stageMetadata.A1Tex, stageData);
 
-        gridWorld.StageName = stageMetadata.name;
-        nameplateGroup.ArtistText = stageMetadata.StageSequenceData.artist;
-        nameplateGroup.TitleText = stageMetadata.StageSequenceData.title;
-        nameplateGroup.DescText = stageMetadata.StageSequenceData.desc;
+        gridWorld.StageName = stageMetadata.name;//"047"
+        nameplateGroup.ArtistText = stageMetadata.StageSequenceData.artist;//"MrHup"
+        nameplateGroup.TitleText = stageMetadata.StageSequenceData.title;//"인공 도시"
+        nameplateGroup.DescText = stageMetadata.StageSequenceData.desc;//"인공지능 기술로 그린 그림. 이제 인간이 설 자리는 어디인가?"
 
         //targetImage.SetTargetImageMaterial(skipBlackMaterial);
 
@@ -146,7 +148,7 @@ public class MainGame : MonoBehaviour
         singlePaletteRenderer.gameObject.SetActive(stageMetadata.StageIndex >= 3);
         singlePaletteRenderer.Initialize(stageMetadata);
 
-        targetImageOutline.material = stageMetadata.SdfMaterial;
+        targetImageOutline.material = stageMetadata.SdfMaterial;//"047-SDF (UnityEngine.Material)"
         // 如果没有SDF Material，干脆不让这个形象出现吧。
         targetImageOutline.enabled = stageMetadata.SdfMaterial != null;
 

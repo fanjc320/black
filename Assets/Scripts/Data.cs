@@ -15,7 +15,7 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 [DisallowMultipleComponent]
 public class Data : MonoBehaviour
 {
-    static bool Verbose => false;
+    static bool Verbose => true;
 
     public static Data Instance;
 
@@ -51,7 +51,7 @@ public class Data : MonoBehaviour
         BlackStringTable.ScStringMap = MessagePackSerializer.Deserialize<ScString[]>(strBuffer, BlackStrOptions);
         Profiler.EndSample();
         Profiler.BeginSample("Deserialize DataSet");
-        var ret = MessagePackSerializer.Deserialize<DataSet>(buffer, DefaultOptions);
+        var ret = MessagePackSerializer.Deserialize<DataSet>(buffer, DefaultOptions);//{DataSet}
         Profiler.EndSample();
         return ret;
     }
@@ -63,32 +63,33 @@ public class Data : MonoBehaviour
 
     static async Task AssignSharedDataSetConditionalAsync()
     {
-        // 에디터 환경에서는 개발 과정 중이므로 반복해서 실행한다.
+        // 在编辑器环境中，因为是在开发过程中，所以会反复运行。
         if (Application.isEditor == false && dataSet != null) return;
 
         dataSet = LoadSharedDataSet();
         Profiler.BeginSample("Prebuild Dependent DataSet");
+        Debug.Log("Prebuild Dependent DataSet fjc");
         await PrebuildDependentDataSetAsync(dataSet);
         Profiler.EndSample();
     }
 
     static async Task PrebuildDependentDataSetAsync(DataSet newDataSet)
     {
-        var stageAssetLocList = await Addressables.LoadResourceLocationsAsync("Stage", typeof(StageMetadata)).Task;
+        var stageAssetLocList = await Addressables.LoadResourceLocationsAsync("Stage", typeof(StageMetadata)).Task;//!!!!!!!
 
         newDataSet.StageMetadataLocDict = stageAssetLocList.ToDictionary(e => e.PrimaryKey, e => e);
         newDataSet.StageMetadataLocList = new List<IResourceLocation>();
 
         foreach (var seq in newDataSet.StageSequenceData)
         {
-            if (newDataSet.StageMetadataLocDict.TryGetValue(seq.stageName, out var stageMetadata))
+            if (newDataSet.StageMetadataLocDict.TryGetValue(seq.stageName, out var stageMetadata))//"001", "Assets/Stages/001backup/001.asset"
             {
                 if (Verbose)
                 {
-                    ConDebug.Log($"Stage: {seq.stageName} - {stageMetadata}");
+                    ConDebug.Log($"Stage: {seq.stageName} -stageMetadata: {stageMetadata}");
                 }
 
-                newDataSet.StageMetadataLocList.Add(stageMetadata);
+                newDataSet.StageMetadataLocList.Add(stageMetadata);//"Assets/Stages/001backup/001.asset"
             }
             else
             {
@@ -96,6 +97,8 @@ public class Data : MonoBehaviour
                 newDataSet.StageMetadataLocList.Add(null);
             }
         }
+
+        Debug.Log($"PrebuildDependentDataSetAsync StageMetadataLocList.Count:{newDataSet.StageMetadataLocList.Count()}:");
     }
 
     public static DataSet LoadSharedDataSet()
@@ -121,7 +124,7 @@ public class Data : MonoBehaviour
         }
 
         Profiler.BeginSample("Deserialize DataSet");
-        var newDataSet = DeserializeDataSet(blackMsgPackBytes.bytes, blackStrMsgPackBytes.bytes);
+        var newDataSet = DeserializeDataSet(blackMsgPackBytes.bytes, blackStrMsgPackBytes.bytes);//{DataSet}
         Profiler.EndSample();
 
         return newDataSet;
