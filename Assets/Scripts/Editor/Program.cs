@@ -507,7 +507,7 @@ namespace black_dev_tools
                             // 收集到的每个像素是 points到, points的 min point作为返回值被接收。.
                             var coord = new Vector2Int(w, h);
                             var fillMinPoint = FloodFill.ExecuteFillIfNotBlack(image, coord, Black, out var pixelArea,
-                            out var points, out var originalColors);
+                            out var points, out var originalColors);////////////
                             Logger.WriteLine($"ExecuteDetermineIsland fillMinPoint:{fillMinPoint} sourceFileName:{sourceFileName} startFileName:{startFileName} image:{image} coord:{coord} pixelArea:{pixelArea}");
                         if (fillMinPoint != new Vector2Int(image.Width, image.Height))
                         {
@@ -549,14 +549,14 @@ namespace black_dev_tools
                             foreach (var point in points) A[point.y - yMin][point.x - xMin] = 1;
 
                             var area = MaxSubRect.MaxRectangle(subRectH, subRectW, A, out var beginIndexR,
-                                out var endIndexR, out var beginIndexC, out var endIndexC);
+                                out var endIndexR, out var beginIndexC, out var endIndexC);//////////////
                             Logger.WriteLine(
                                 $"Sub Rect: area:{area} [({yMin + beginIndexR},{xMin + beginIndexC})-({yMin + endIndexR},{xMin + endIndexC})]");
                             maxRectByMinPoint[Vector2IntToUInt32(fillMinPoint)] = GetRectRange(
                                 xMin + beginIndexC,
                                 yMin + beginIndexR,
                                 xMin + endIndexC,
-                                yMin + endIndexR);
+                                yMin + endIndexR);///!!!!!!!!!!!
                         }
                         else
                         {
@@ -607,7 +607,7 @@ namespace black_dev_tools
                         index = islandIndex2,
                         pixelArea = islandPixelAreaByMinPoint[kv.Key],
                         rgba = Rgba32ToUInt32(islandColorByMinPoint[kv.Key]),
-                        maxRect = maxRectByMinPoint[p]
+                        maxRect = maxRectByMinPoint[p]////!!!!!!!!
                     };
                     islandIndex2++;
                 }
@@ -763,6 +763,7 @@ namespace black_dev_tools
                             for (var hh = -ss; hh <= ss; hh++)
                                 for (var ww = -ss; ww <= ss; ww++)
                                 {
+                                    //Logger.WriteLine($"ExecuteOutlineToBlack forfor h:{h} hh:{hh} w:{w} ww:{ww}");//hh:0,ww:0
                                     SetPixelClamped(newImage, w + ww, h + hh, Black);
                                 }
                         }

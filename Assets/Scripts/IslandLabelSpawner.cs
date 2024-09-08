@@ -81,8 +81,8 @@ public class IslandLabelSpawner : MonoBehaviour
             var labelRt = label.Rt;//"Island Label(Clone) (UnityEngine.RectTransform)"
             var texSizeFloat = (float) gridWorld.TexSize;//1500
             var delta = rt.sizeDelta;
-            var anchoredPosition = kv.Value.center / texSizeFloat * delta - delta / 2;
-            labelRt.anchoredPosition = anchoredPosition;
+            var anchoredPosition = kv.Value.center / texSizeFloat * delta - delta / 2;//!!!!!!!!!!!
+            labelRt.anchoredPosition = anchoredPosition;//////
             var sizeDelta = (Vector2) kv.Value.size / texSizeFloat * delta;
             labelRt.sizeDelta = sizeDelta;
             var paletteIndex = paletteButtonGroup.GetPaletteIndexByColor(stageData.islandDataByMinPoint[kv.Key].rgba);
