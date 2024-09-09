@@ -84,8 +84,8 @@ internal static class StageEditorUtil
 #if IMAGESHARP
         Program.Main(new[]
         {
-            /* 00 */ "dit",
-            ///* 00 */ "di",
+            ///* 00 */ "dit",
+            /* 00 */ "fsnb",
             /* 01 */ assetPath,
             /* 02 */ maxPaletteCount.ToString(),
             /* 03 */ "",

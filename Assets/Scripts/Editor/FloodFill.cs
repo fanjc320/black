@@ -104,7 +104,7 @@ namespace black_dev_tools
                     var oldColor = SetPixel(bitmap, w.x, w.y, replacementColor);
                     Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                     UpdateFillMinPoint(ref fillMinPoint, w);
-                    //Logger.WriteLine($"ExecuteFillIfNotBlack oldColor:{oldColor} originalColors:{originalColors} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
+                    Logger.WriteLine($"ExecuteFillIfNotBlack oldColor:{oldColor} originalColors:{originalColors} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
                     points.Add(w);
                     pixelArea++;
                     if (w.y > 0 && ColorIsNotBlack(GetPixel(bitmap, w.x, w.y - 1)))
