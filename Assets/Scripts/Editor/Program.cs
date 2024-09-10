@@ -15,8 +15,12 @@ using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using Color = SixLabors.ImageSharp.Color;
 using Vector4 = System.Numerics.Vector4;
 using NUnit.Framework.Internal;
+using System.Drawing;
+using UnityEngine;
 #if UNITY_2020_1_OR_NEWER
 using Math = UnityEngine.Mathf;
+using Image = SixLabors.ImageSharp.Image;
+using Size = SixLabors.ImageSharp.Size;
 
 #endif
 
@@ -56,7 +60,19 @@ namespace black_dev_tools
                 ProcessSingleFileAdaptiveOutlineThreshold(args);
         }
 
-        static void ProcessSingleFileAdaptiveOutlineThreshold(string[] args)
+        public static void TestImageArr(string path)
+        {
+            var image = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
+            TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg").GetComponent<TestImgDbg>();
+            if (ttImg == null)
+            {
+                Debug.LogError("ExecuteFillIfNotBlack -----  img is null");
+            }
+            Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(image);
+            ttImg.setImg(tex);
+        }
+
+            static void ProcessSingleFileAdaptiveOutlineThreshold(string[] args)
         {
             try
             {
@@ -741,7 +757,7 @@ namespace black_dev_tools
         // 将模糊的黑色变为完全的黑色-OTB
         static string ExecuteOutlineToBlack(string sourceFileName, int threshold)
         {
-            Logger.WriteLine($"ExecuteOutlineToBlack Running {nameof(ExecuteOutlineToBlack)}");
+            Logger.WriteLine($"ExecuteOutlineToBlack Running {nameof(ExecuteOutlineToBlack)} sourceFileName:{sourceFileName}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-OTB");
             using (var image = Image.Load<Rgba32>(sourceFileName))

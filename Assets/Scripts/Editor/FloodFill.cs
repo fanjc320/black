@@ -1,18 +1,27 @@
 #if IMAGESHARP
 using System.Collections.Generic;
 using System.IO;
+using Assets.Scripts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UnityEngine;
 
 namespace black_dev_tools
 {
-    
+    //public class TestImgDbg : MonoBehaviour
+    //{
+    //    public Image imgDbg;
+    //    public void setImg(Image img)
+    //    {
+    //        imgDbg = img;
+    //    }
+    //}
     internal class FloodFill
     {
         static readonly Rgba32 Black = Rgba32.ParseHex("000000ff");
         static readonly Rgba32 White = Rgba32.ParseHex("ffffffff");
-
+        public Image imgDbg;
+        public TestImgDbg testImgDbg;
         static bool ColorMatch(Rgba32 a, Rgba32 b)
         {
             return a == b;
@@ -92,6 +101,14 @@ namespace black_dev_tools
             var q = new Queue<Vector2Int>();
             q.Enqueue(pt);
             var fillMinPoint = new Vector2Int(bitmap.Width, bitmap.Height);
+            //testImgDbg.setImg(bitmap); 
+            TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg").GetComponent<TestImgDbg>();
+            if (ttImg == null)
+            {
+                Debug.LogError("ExecuteFillIfNotBlack -----  img is null");
+            }
+            Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(bitmap);
+            ttImg.setImg(tex);
             pixelArea = 0;
             while (q.Count > 0)
             {

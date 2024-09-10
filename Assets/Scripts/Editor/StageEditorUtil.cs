@@ -12,6 +12,30 @@ internal static class StageEditorUtil
     static readonly int SdfTexture = Shader.PropertyToID("SdfTexture");
     static readonly int ColorTexture = Shader.PropertyToID("ColorTexture");
 
+    [MenuItem("Assets/Black/TestImageArr")]
+    [UsedImplicitly]
+    static void TestImageArr()
+    {
+        if (Selection.objects != null)
+        {
+                for (var i = 0; i < Selection.objects.Length; i++)
+                {
+                var targetObject = Selection.objects[i];
+                var assetPath = AssetDatabase.GetAssetPath(targetObject);
+                var assetDirName = Path.GetDirectoryName(assetPath);
+                Debug.Log($"TestImageArr assetPath:{assetPath} assetDirName:{assetDirName}");
+                //Program.TestImageArr(Selection.objects[i], false);
+                Program.TestImageArr(assetPath);
+                }
+        }
+        else
+        {
+            Debug.LogWarning("No active object selected. Select a single PNG, JPEG file to create a new stage.");
+        }
+
+        
+    }
+
     [MenuItem("Assets/Black/Import New Stage (PNG, JPEG Image)")]
     [UsedImplicitly]
     static void ImportNewStage_PngJpegImage()
