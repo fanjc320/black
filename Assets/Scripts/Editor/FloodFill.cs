@@ -1,4 +1,5 @@
 #if IMAGESHARP
+#define TestFill
 using System.Collections.Generic;
 using System.IO;
 using Assets.Scripts;
@@ -21,6 +22,10 @@ namespace black_dev_tools
     {
         static readonly Rgba32 Black = Rgba32.ParseHex("000000ff");
         static readonly Rgba32 White = Rgba32.ParseHex("ffffffff");
+        static readonly Rgba32 Green = Rgba32.ParseHex("9fb300ff");
+        static readonly Rgba32 Green1 = Rgba32.ParseHex("ccff00ff");
+        static readonly Rgba32 Blue1 = Rgba32.ParseHex("00ffffff");
+        static readonly Rgba32 Red = Rgba32.ParseHex("ff0000ff");
         //public Image imgDbg;
         public TestImgDbg testImgDbg;
         static bool ColorMatch(Rgba32 a, Rgba32 b)
@@ -94,24 +99,23 @@ namespace black_dev_tools
             return fillMinPoint;
         }
 
+        static int viewIndex = 0;
+        static int bitmapIndex = 0;
         public static Vector2Int ExecuteFillIfNotBlack(Image<Rgba32> bitmap, Vector2Int pt, Rgba32 replacementColor,
-            out int pixelArea, out List<Vector2Int> points, out Dictionary<Rgba32, int> originalColors)
+            out int pixelArea, out List<Vector2Int> points, out Dictionary<Rgba32, int> originalColors, Image<Rgba32> bitmapTest)
         {
+            Debug.LogError("ExecuteFillIfNotBlack ------------- BEGIN ------------pt:" + pt);
             points = new List<Vector2Int>();
             originalColors = new Dictionary<Rgba32, int>();
             var q = new Queue<Vector2Int>();
             q.Enqueue(pt);
             var fillMinPoint = new Vector2Int(bitmap.Width, bitmap.Height);
-            //testImgDbg.setImg(bitmap); 
-            TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg").GetComponent<TestImgDbg>();
-            RawImage rawImg = GameObject.Find("Canvas/RawImage").GetComponent<RawImage>();
-            if (ttImg == null || rawImg == null)
-            {
-                Debug.LogError("ExecuteFillIfNotBlack -----  img is null");
-            }
-            Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(bitmap);
-            ttImg.setImg(tex);
-            rawImg.texture = tex;
+#if TestFill
+            SetPixel(bitmapTest, pt.x, pt.y, Red);
+            //Assets.Scripts.ImageExtensions.ToUnityTexture(bitmapTest);//save as png
+            //效果是一个个非黑色的区域被填充了黑色
+            bitmap.SaveAsPng($"Assets/Stages/051/view/view_{viewIndex++}.png");//ok!!!
+#endif
 
             pixelArea = 0;
             while (q.Count > 0)
@@ -125,7 +129,14 @@ namespace black_dev_tools
                     var oldColor = SetPixel(bitmap, w.x, w.y, replacementColor);
                     Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                     UpdateFillMinPoint(ref fillMinPoint, w);
-                    //Logger.WriteLine($"ExecuteFillIfNotBlack oldColor:{oldColor} originalColors:{originalColors} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
+
+                    SetPixel(bitmapTest, w.x, w.y, Blue1);////明显看出填充效果
+                    ////Logger.WriteLine($"ExecuteFillIfNotBlack 00 oldColor:{oldColor} replacementColor:{replacementColor} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
+                    ////foreach (var color in originalColors)
+                    ////{
+                    ////    Logger.WriteLine($"ExecuteFillIfNotBlack 00 originalColors color:{color}");
+                    ////}
+
                     points.Add(w);
                     pixelArea++;
                     if (w.y > 0 && ColorIsNotBlack(GetPixel(bitmap, w.x, w.y - 1)))
@@ -140,6 +151,16 @@ namespace black_dev_tools
                     var oldColor = SetPixel(bitmap, e.x, e.y, replacementColor);
                     Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                     UpdateFillMinPoint(ref fillMinPoint, e);
+#if TestFill
+                    SetPixel(bitmapTest, fillMinPoint.x, fillMinPoint.y, Green);//基本上fillMinPoint没变
+                    //SetPixel(bitmapTest, e.x, e.y, Green);//明显看出填充效果
+
+                    ////Logger.WriteLine($"ExecuteFillIfNotBlack 11 oldColor:{oldColor} replacementColor:{replacementColor} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
+                    ////foreach (var color in originalColors)
+                    ////{
+                    ////    Logger.WriteLine($"ExecuteFillIfNotBlack 11 originalColors color:{color}");
+                    ////}
+#endif
                     points.Add(e);
                     pixelArea++;
                     if (e.y > 0 && ColorIsNotBlack(GetPixel(bitmap, e.x, e.y - 1)))
@@ -153,6 +174,9 @@ namespace black_dev_tools
                 //    bitmap.SaveAsPng(stream);
                 //    stream.Close();
                 //}
+
+                //ok!!!能看出来一条条黑色横线自上而下或自下而上扫描
+                bitmap.SaveAsPng($"Assets/Stages/051/bitmap/bitmap_{viewIndex}_{bitmapIndex++}.png");
             }
 
             return fillMinPoint;
@@ -168,6 +192,18 @@ namespace black_dev_tools
             q.Enqueue(pt);
             var fillMinPoint = new Vector2Int(bitmap.Width, bitmap.Height);
             pixelArea = 0;
+
+            Image<Rgba32> bitmapTest = bitmap.Clone();
+            Rgba32 Red = Rgba32.ParseHex("ff0000ff");
+            Rgba32 Blue = Rgba32.ParseHex("FF70DB93");
+            //TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg_ExecuteFillIf").GetComponent<TestImgDbg>();
+            //RawImage rawImg = GameObject.Find("Canvas/RawImage_ExecuteFillIf").GetComponent<RawImage>();
+            //if (rawImg == null)
+            //{
+            //    Debug.LogError("ExecuteFillIf -----  img is null");
+            //}
+            ////Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(bitmapTest);
+
             while (q.Count > 0)
             {
                 var n = q.Dequeue();
@@ -185,6 +221,16 @@ namespace black_dev_tools
                         setPixelCallback?.Invoke(islandIndex, w.x, w.y);
                         Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                         UpdateFillMinPoint(ref fillMinPoint, w);
+
+                        //SetPixel(bitmapTest, fillMinPoint.x, fillMinPoint.y, Red);
+                        //Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(bitmapTest);
+                        //rawImg.texture = tex;
+                        //Logger.WriteLine($"ExecuteFillIf 00 oldColor:{oldColor} replacementColor:{replacementColor} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
+                        //foreach (var color in originalColors)
+                        //{
+                        //    Logger.WriteLine($"ExecuteFillIf 00 originalColors color:{color}");
+                        //}
+
                         points.Add(w);
                         pixelArea++;
                         if (w.y > 0 && ColorIsNotAndNotBlack(GetPixel(bitmap, w.x, w.y - 1), replacementColor))
@@ -205,6 +251,16 @@ namespace black_dev_tools
                         setPixelCallback?.Invoke(islandIndex, e.x, e.y);
                         Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                         UpdateFillMinPoint(ref fillMinPoint, e);
+
+                        //SetPixel(bitmapTest, fillMinPoint.x, fillMinPoint.y, Red);
+                        //Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(bitmapTest);
+                        //rawImg.texture = tex;
+                        //Logger.WriteLine($"ExecuteFillIf 01 oldColor:{oldColor} replacementColor:{replacementColor} fillMinPoint:{fillMinPoint}  pt:{pt}");
+                        //foreach (var color in originalColors)
+                        //{
+                        //    Logger.WriteLine($"ExecuteFillIf 01 originalColors color:{color}");
+                        //}
+
                         points.Add(e);
                         pixelArea++;
                         if (e.y > 0 && ColorIsNotAndNotBlack(GetPixel(bitmap, e.x, e.y - 1), replacementColor))

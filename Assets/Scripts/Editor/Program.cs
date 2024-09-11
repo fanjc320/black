@@ -40,6 +40,9 @@ namespace black_dev_tools
 
         static readonly Rgba32 Black = Rgba32.ParseHex("000000ff");
         static readonly Rgba32 Red = Rgba32.ParseHex("ff0000ff");
+        static readonly Rgba32 Green = Rgba32.ParseHex("9fb300ff");
+        static readonly Rgba32 Green1 = Rgba32.ParseHex("ccff00ff");
+        static readonly Rgba32 Blue1 = Rgba32.ParseHex("00ffffff");
         static readonly Rgba32 White = Rgba32.ParseHex("ffffffff");
         static readonly Rgba32 AllZeros = Rgba32.ParseHex("00000000");
 
@@ -400,6 +403,16 @@ namespace black_dev_tools
 
                 var islandIndex = 1; // Island Index 0为大纲保留。
 
+                Image<Rgba32> bitmapTest = image.Clone();
+                Rgba32 Red = Rgba32.ParseHex("ff0000ff");
+                Rgba32 Blue = Rgba32.ParseHex("FF70DB93");
+                //TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg_ExecuteFillIf").GetComponent<TestImgDbg>();
+                //RawImage rawImg = GameObject.Find("Canvas/RawImage_ExecuteDetermineIslandTest").GetComponent<RawImage>();
+                //if (rawImg == null)
+                //{
+                //    Debug.LogError("ExecuteDetermineIslandTest -----  img is null");
+                //}
+
                 // 您不应依赖于字典的迭代顺序，而应使用岛数据中指定的索引顺序。
                 foreach (var island in stageData.islandDataByMinPoint.OrderBy(e => e.Value.index))//!!!!!!!
                 {
@@ -413,7 +426,17 @@ namespace black_dev_tools
                             a1Tex[fx, fy] = new Rgba32 {A = a1};
                             a2Tex[fx, fy] = new Rgba32 {A = a2};
                         });
-                    Logger.WriteLine($"ExecuteDetermineIslandTest foreach key:{island.Key} targetCol:{targetColor} paletteIndex:{paletteIndex}");
+
+                    //SetPixel(bitmapTest, fillMinPoint.x, fillMinPoint.y, Red);
+                    //Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(bitmapTest);
+                    //rawImg.texture = tex;
+                    //Logger.WriteLine($"ExecuteDetermineIslandTest 00 oldColor:{oldColor} replacementColor:{replacementColor} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
+                    //foreach (var color in originalColors)
+                    //{
+                    //    Logger.WriteLine($"ExecuteDetermineIslandTest 00 originalColors color:{color}");
+                    //}
+
+                    //Logger.WriteLine($"ExecuteDetermineIslandTest foreach key:{island.Key} targetCol:{targetColor} paletteIndex:{paletteIndex}");
                     if (fillMinPoint == new Vector2Int(image.Width, image.Height))
                     {
                         if (errorAsWarning)
@@ -511,6 +534,7 @@ namespace black_dev_tools
                 // Min Point 星（岛星） Max Rect
                 var maxRectByMinPoint = new Dictionary<uint, ulong>();
 
+                Image<Rgba32> bitmapTest = image.Clone();
                 // 对每个像素重复此操作。
                 for (var h = 0; h < image.Height; h++)
                 for (var w = 0; w < image.Width; w++)
@@ -527,7 +551,7 @@ namespace black_dev_tools
                             // 收集到的每个像素是 points到, points的 min point作为返回值被接收。.
                             var coord = new Vector2Int(w, h);
                             var fillMinPoint = FloodFill.ExecuteFillIfNotBlack(image, coord, Black, out var pixelArea,
-                            out var points, out var originalColors);////////////
+                            out var points, out var originalColors, bitmapTest);////////////这里的Black不能改为别的颜色，否则函数内部会死循环，因为内部是靠Black去识别的
                             Logger.WriteLine($"ExecuteDetermineIsland fillMinPoint:{fillMinPoint} sourceFileName:{sourceFileName} startFileName:{startFileName} image:{image} coord:{coord} pixelArea:{pixelArea}");
                         if (fillMinPoint != new Vector2Int(image.Width, image.Height))
                         {
@@ -837,6 +861,7 @@ namespace black_dev_tools
         // 用黑色填充最小的非黑色空间。-FSNB
         static string ExecuteFillSmallNotBlack(string sourceFileName, int threshold = 4 * 4 * 4)
         {
+            //Running ExecuteFillSmallNotBlack  sourceFileName:Assets\Stages\051\rect4-OTB.jpg
             Logger.WriteLine($"Running {nameof(ExecuteFillSmallNotBlack)}  sourceFileName:{sourceFileName}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-FSNB");
@@ -844,6 +869,7 @@ namespace black_dev_tools
             var islandPixelAreaByMinPoint = new Dictionary<Vector2Int, int>();
             using (var image = Image.Load<Rgba32>(sourceFileName))
             {
+                Image<Rgba32> bitmapTest = image.Clone();
                 // 对每个像素重复此操作。
                 for (var h = 0; h < image.Height; h++)
                 for (var w = 0; w < image.Width; w++)
@@ -852,6 +878,7 @@ namespace black_dev_tools
                     if (pixelColor == Black)
                     {
                             // 如果边框颜色为黑色，则无需执行任何操作
+                            Logger.WriteLine($"ExecuteFillSmallNotBlack() aaaaa Black >> w:{w} h:{h} pixelColor:{pixelColor}");
                         }
                         else
                     {
@@ -859,10 +886,12 @@ namespace black_dev_tools
                             // 收集到的每个像素是 points到, points的 min point作为返回值被接收。
                             var coord = new Vector2Int(w, h);
                         var fillMinPoint = FloodFill.ExecuteFillIfNotBlack(image, coord, Black, out var pixelArea,
-                            out _, out _);
+                            out _, out _, bitmapTest);
+                            //image非黑色的区域被填充，那么这个区域的像素只会执行一次填充，以后就走pixelColor == Black的逻辑，所以有几个非黑色区域，这里就执行几次，即岛的次数
+                            Logger.WriteLine($"ExecuteFillSmallNotBlack() aaaaa noBlack ########### coord:{coord} fillMinPoint:{fillMinPoint} pixelColor:{pixelColor}");
                         if (fillMinPoint != new Vector2Int(image.Width, image.Height))
-                            islandPixelAreaByMinPoint[fillMinPoint] = pixelArea;
-                        else
+                            islandPixelAreaByMinPoint[fillMinPoint] = pixelArea;//pixelArea存储的是像素数量, 那么islandPixelAreaByMinPoint是岛的数量
+                            else
                             throw new Exception("Invalid fill min point!");
                     }
                 }
@@ -872,11 +901,13 @@ namespace black_dev_tools
             // 从这里开始，小的非黑色单元格被黑色单元格填充。
             using (var image = Image.Load<Rgba32>(sourceFileName))
             {
+                Image<Rgba32> bitmapTest = image.Clone();
                 foreach (var island in islandPixelAreaByMinPoint)
-                    if (island.Value < threshold)
+                    if (island.Value < threshold)//如果岛的像素数量小于阈值，就填充黑色,这样就去掉"小岛"了
                     {
+                        Logger.WriteLine("ExecuteFillSmallNotBlack() bbbbbbbbbbbb >>>>>>>>>>");
                         var fillMinPoint = FloodFill.ExecuteFillIfNotBlack(image, island.Key, Black, out var pixelArea,
-                            out _, out _);
+                            out _, out _, bitmapTest);
                         if (fillMinPoint != new Vector2Int(image.Width, image.Height) && pixelArea == island.Value)
                         {
                         }
@@ -931,6 +962,13 @@ namespace black_dev_tools
         {
             pixelCountByColor.TryGetValue(pixel, out var currentCount);
             pixelCountByColor[pixel] = currentCount + 1;
+        }
+
+        static Rgba32 SetPixel(Image<Rgba32> bitmap, int x, int y, Rgba32 c)
+        {
+            var originalColor = bitmap[x, y];
+            bitmap[x, y] = c;
+            return originalColor;
         }
     }
 }

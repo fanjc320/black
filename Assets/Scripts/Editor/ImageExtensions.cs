@@ -106,43 +106,31 @@ namespace Assets.Scripts
         //        return returnImage;
         //    }
         //}
-
+        public static int viewIndex = 0;
         public static Texture2D ToUnityTexture(this SixLabors.ImageSharp.Image imageIn)
         {
-            //Texture2D tex = new Texture2D(imageIn.Width, imageIn.Height, TextureFormat.PVRTC_RGBA4, false);
-            Texture2D tex = new Texture2D(imageIn.Width, imageIn.Height, TextureFormat.RGBA32, false);
-            using (MemoryStream ms = new MemoryStream())
-            {
-                //imageIn.Save(ms, JpegFormat.Instance);
-                ////byte[] tmp = ms.ToArray();
-                ////tex.LoadRawTextureData(tmp);
-                ////UnityException: LoadRawTextureData: not enough data provided (will result in overread)
-                //tex.LoadRawTextureData(ms.ToArray());//
-
-                //imageIn.savepi
-            }
-
-            byte[] bts = ToArray(imageIn, PngFormat.Instance);
-            Debug.Log("ToUnityTexture bts.length" + bts.Length + " wid:" + imageIn.Width + " hei:" + imageIn.Height + " format:" +
-                imageIn.GetConfiguration().ImageFormatsManager.ImageFormats);//1030
+            //byte[] bts = ToArray(imageIn, PngFormat.Instance);
+            //Debug.Log("ToUnityTexture bts.length" + bts.Length + " wid:" + imageIn.Width + " hei:" + imageIn.Height + " format:" +
+            //    imageIn.GetConfiguration().ImageFormatsManager.ImageFormats);//1030
             //tex.LoadRawTextureData(bts);
 
-            byte[] jpegImage;
-            using (MemoryStream buffer = new())
-            {
-                //using Image<Rgba32> image = new(100, 100);
-                //image.SaveAsJpeg(buffer);
-                imageIn.SaveAsPng(buffer);
-                //var imageEncoder = imageIn.GetConfiguration().ImageFormatsManager.FindEncoder(imageFormat);
-                imageIn.SaveAsPng("Assets/Stages/051/cry_1.png");
-                jpegImage = buffer.ToArray();
-            }
-            Debug.Log("ToUnityTexture jpegImage.length" + jpegImage.Length );
-            //tex.LoadRawTextureData(jpegImage);//报错!!!!!!error
-            ImageConversion.LoadImage(tex, jpegImage);//ok!!!!!!!!!!!!!!!!!!!!!!!!
-            //参考 https://docs.unity3d.com/ScriptReference/ImageConversion.LoadImage.html
+            imageIn.SaveAsPng($"Assets/Stages/051/view/view_{viewIndex++}.png");//ok!!!
 
-            return tex;
+            //ok!!!!!!!!!
+            //Texture2D tex = new Texture2D(imageIn.Width, imageIn.Height, TextureFormat.RGBA32, false);
+            //byte[] pngImage;
+            //using (MemoryStream buffer = new())
+            //{
+            //    imageIn.SaveAsPng(buffer);
+            //    pngImage = buffer.ToArray();
+            //    ImageConversion.LoadImage(tex, pngImage);//ok!!!!!!!!!!!!!!!!!!!!!!!!
+            //}
+            //return tex;
+
+            //Debug.Log("ToUnityTexture jpegImage.length" + jpegImage.Length );
+            //tex.LoadRawTextureData(jpegImage);//报错!!!!!!error
+            //参考 https://docs.unity3d.com/ScriptReference/ImageConversion.LoadImage.html
+            return null;
         }
 
         public static byte[] ToArray1(this SixLabors.ImageSharp.Image imageIn)
