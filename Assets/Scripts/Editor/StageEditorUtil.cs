@@ -109,8 +109,8 @@ internal static class StageEditorUtil
         Program.Main(new[]
         {
             ///* 00 */ "dit",
-            /* 00 */ "fsnb",
-            ///* 00 */ "q",
+            ///* 00 */ "fsnb",
+            /* 00 */ "q",
             /* 01 */ assetPath,
             /* 02 */ maxPaletteCount.ToString(),
             /* 03 */ "",

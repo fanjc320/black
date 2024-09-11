@@ -18,6 +18,7 @@ using NUnit.Framework.Internal;
 using System.Drawing;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.AddressableAssets.Build.BuildPipelineTasks.GenerateLocationListsTask;
 #if UNITY_2020_1_OR_NEWER
 using Math = UnityEngine.Mathf;
 using Image = SixLabors.ImageSharp.Image;
@@ -253,7 +254,10 @@ namespace black_dev_tools
             else if (mode == "q")
             {
                 ExecuteOutlineToBlack(startFileName, outlineThreshold);
-                ExecuteQuantize(startFileName, maxColor);
+            //https://github.com/leeoniya/RgbQuant.js/
+                //Color quantization is the process of reducing an image with thousands or millions of colors to one with fewer(usually 256). 
+                //The trick is to balance speed, cpu and memory requirements while minimizing the perceptual loss in output quality. More info can be found on wikipedia.Various algorithms can be found on rosettacode.org.
+                ExecuteQuantize(startFileName, maxColor);//减少图片的颜色，即颜色的离散化
             }
             else if (mode == "fots")
             {
@@ -678,7 +682,7 @@ namespace black_dev_tools
         // 确保从调色板中排除黑色和白色。
         static string ExecuteQuantize(string sourceFileName, int maxColor = 30)
         {
-            Logger.WriteLine($"ExecuteQuantize Running {nameof(ExecuteQuantize)}");
+            Logger.WriteLine($"ExecuteQuantize Running {nameof(ExecuteQuantize)} sourceFileName:{sourceFileName}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-Q");
 
