@@ -17,6 +17,7 @@ using Vector4 = System.Numerics.Vector4;
 using NUnit.Framework.Internal;
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.UI;
 #if UNITY_2020_1_OR_NEWER
 using Math = UnityEngine.Mathf;
 using Image = SixLabors.ImageSharp.Image;
@@ -64,12 +65,14 @@ namespace black_dev_tools
         {
             var image = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
             TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg").GetComponent<TestImgDbg>();
+            RawImage rawImg = GameObject.Find("Canvas/RawImage").GetComponent<RawImage>();
             if (ttImg == null)
             {
                 Debug.LogError("ExecuteFillIfNotBlack -----  img is null");
             }
             Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(image);
             ttImg.setImg(tex);
+            rawImg.texture = tex;
         }
 
             static void ProcessSingleFileAdaptiveOutlineThreshold(string[] args)
@@ -113,6 +116,7 @@ namespace black_dev_tools
             Logger.WriteLine($"Running {nameof(ExecuteSdf)}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-SDF");
+            System.Drawing.Image tmp;
             using (var image = Image.Load<Rgba32>(sourceFileName))
             {
                 var targetImage = new Image<Rgba32>(image.Width, image.Height);

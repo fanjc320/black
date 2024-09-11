@@ -5,7 +5,7 @@ using SixLabors.ImageSharp.Formats;
 using System;
 using System.Collections.Generic;
 //using System.Drawing.Imaging;
-//using System.Drawing;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,10 @@ using UnityEngine;
 using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using UnityEngine.Assertions;
+using SixLabors.ImageSharp.Memory;
+using System.Numerics;
+using Image = SixLabors.ImageSharp.Image;
+using UnityEngine.UI;
 
 namespace Assets.Scripts
 {
@@ -132,12 +136,49 @@ namespace Assets.Scripts
                 //var imageEncoder = imageIn.GetConfiguration().ImageFormatsManager.FindEncoder(imageFormat);
                 imageIn.SaveAsPng("Assets/Stages/051/cry_1.png");
                 jpegImage = buffer.ToArray();
-                imageIn.copy
             }
             Debug.Log("ToUnityTexture jpegImage.length" + jpegImage.Length );
-            //tex.LoadRawTextureData(jpegImage);
+            //tex.LoadRawTextureData(jpegImage);//报错!!!!!!error
+            ImageConversion.LoadImage(tex, jpegImage);//ok!!!!!!!!!!!!!!!!!!!!!!!!
+            //参考 https://docs.unity3d.com/ScriptReference/ImageConversion.LoadImage.html
+
             return tex;
         }
+
+        public static byte[] ToArray1(this SixLabors.ImageSharp.Image imageIn)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                imageIn.Save(ms, PngFormat.Instance);
+                return ms.ToArray();
+            }
+        }
+
+        public static System.Drawing.Image ToDrawingImage(this byte[] byteArrayIn)
+        {
+            using (MemoryStream ms = new MemoryStream(byteArrayIn))
+            {
+                System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
+                return returnImage;
+            }
+        }
+
+        //https://www.gamedev.net/forums/topic/701489-memorystream-use-in-unity-for-systemdrawingimage/
+        public static System.Drawing.Image byteArrayToImage(byte[] byteArrayIn)
+        {
+            MemoryStream ms = new MemoryStream(byteArrayIn);
+            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
+            return returnImage;
+
+        }
+
+        //public static void drawImage(Image<TPixel> image)
+        //{
+        //    Buffer2D<TPixel> pixels = image.GetRootFramePixelBuffer();
+        //    Debug.Log("ToUnityTexture jpegImage.length" + jpegImage.Length);
+        //    //tex.LoadRawTextureData(jpegImage);//报错!!!!!!error
+        //    return tex;
+        //}
 
         //https://gist.github.com/vurdalakov/00d9471356da94454b372843067af24e
         public static Byte[] ToArray<TPixel>(this Image<TPixel> image, IImageFormat imageFormat) where TPixel : unmanaged, IPixel<TPixel>

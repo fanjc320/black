@@ -5,6 +5,7 @@ using Assets.Scripts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace black_dev_tools
 {
@@ -20,7 +21,7 @@ namespace black_dev_tools
     {
         static readonly Rgba32 Black = Rgba32.ParseHex("000000ff");
         static readonly Rgba32 White = Rgba32.ParseHex("ffffffff");
-        public Image imgDbg;
+        //public Image imgDbg;
         public TestImgDbg testImgDbg;
         static bool ColorMatch(Rgba32 a, Rgba32 b)
         {
@@ -103,12 +104,15 @@ namespace black_dev_tools
             var fillMinPoint = new Vector2Int(bitmap.Width, bitmap.Height);
             //testImgDbg.setImg(bitmap); 
             TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg").GetComponent<TestImgDbg>();
-            if (ttImg == null)
+            RawImage rawImg = GameObject.Find("Canvas/RawImage").GetComponent<RawImage>();
+            if (ttImg == null || rawImg == null)
             {
                 Debug.LogError("ExecuteFillIfNotBlack -----  img is null");
             }
             Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(bitmap);
             ttImg.setImg(tex);
+            rawImg.texture = tex;
+
             pixelArea = 0;
             while (q.Count > 0)
             {
@@ -121,7 +125,7 @@ namespace black_dev_tools
                     var oldColor = SetPixel(bitmap, w.x, w.y, replacementColor);
                     Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                     UpdateFillMinPoint(ref fillMinPoint, w);
-                    Logger.WriteLine($"ExecuteFillIfNotBlack oldColor:{oldColor} originalColors:{originalColors} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
+                    //Logger.WriteLine($"ExecuteFillIfNotBlack oldColor:{oldColor} originalColors:{originalColors} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");
                     points.Add(w);
                     pixelArea++;
                     if (w.y > 0 && ColorIsNotBlack(GetPixel(bitmap, w.x, w.y - 1)))

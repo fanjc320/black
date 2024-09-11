@@ -150,7 +150,9 @@ internal static class StageEditorUtil
     static void ImportStageFromRawStageData(TextAsset rawStageData)
     {
         var rawStageDataFullPath = AssetDatabase.GetAssetPath(rawStageData);
+        Debug.Log($"ImportStageFromRawStageData: rawStageDataFullPath:{rawStageDataFullPath}");
         var stageDir = Path.GetDirectoryName(rawStageDataFullPath);
+        Debug.Log($"ImportStageFromRawStageData: rawStageDataFullPath{rawStageDataFullPath} stageDir:{stageDir}");
         Debug.Log(stageDir);
         if (string.IsNullOrEmpty(stageDir))
         {
