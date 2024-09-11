@@ -110,7 +110,8 @@ internal static class StageEditorUtil
         {
             ///* 00 */ "dit",
             ///* 00 */ "fsnb",
-            /* 00 */ "q",
+            ///* 00 */ "q",
+            "fots",
             /* 01 */ assetPath,
             /* 02 */ maxPaletteCount.ToString(),
             /* 03 */ "",

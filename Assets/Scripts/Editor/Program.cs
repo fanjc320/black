@@ -720,9 +720,11 @@ namespace black_dev_tools
         }
 
         // sourceFileName 多于outlineFileName穿上它。佩戴时，只能使用全黑色。
+        //fjc 对sourceFileName这个被Quantize过的图片，叠加fsnb的黑色，因为fsnb是填满了小黑洞的图。
         static string ExecuteFlattenedOutlineToSource(string sourceFileName, string outlineFileName)
         {
-            Logger.WriteLine($"ExecuteFlattenedOutlineToSource Running {nameof(ExecuteFlattenedOutlineToSource)}");
+            //ExecuteFlattenedOutlineToSource sourceFileName:Assets\Stages\051\rect4 - Q.jpg outlineFileName: Assets\Stages\051\rect4 - OTB - FSNB.jpg
+            Logger.WriteLine($"ExecuteFlattenedOutlineToSource Running {nameof(ExecuteFlattenedOutlineToSource)} sourceFileName:{sourceFileName} outlineFileName:{outlineFileName}");
 
             var targetFileName = AppendToFileName(outlineFileName, "-FOTS");
             using (var sourceImage = Image.Load<Rgba32>(sourceFileName))
