@@ -335,17 +335,17 @@ public class GridWorld : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     
     void UpdatePaletteBySolutionColor(uint fillMinPointUint, uint solutionColorUint, bool batch)
     {
-        islandLabelSpawner.DestroyLabelByMinPoint(fillMinPointUint);
+        islandLabelSpawner.DestroyLabelByMinPoint(fillMinPointUint);//3866689
 
         coloredMinPoints.Add(fillMinPointUint);
 
-        if (coloredIslandCountByColor.TryGetValue(solutionColorUint, out var coloredIslandCount))
+        if (coloredIslandCountByColor.TryGetValue(solutionColorUint, out var coloredIslandCount))//4294901246,0
             coloredIslandCount++;
         else
             coloredIslandCount = 1;
 
-        coloredIslandCountByColor[solutionColorUint] = coloredIslandCount;
-        paletteButtonGroup.UpdateColoredCount(solutionColorUint, coloredIslandCount, batch);
+        coloredIslandCountByColor[solutionColorUint] = coloredIslandCount;//[4294901246]=1
+        paletteButtonGroup.UpdateColoredCount(solutionColorUint, coloredIslandCount, batch); //4294901246,1,false
     }
 
     enum FillResult

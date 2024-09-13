@@ -54,6 +54,14 @@ public class IslandLabelSpawner : MonoBehaviour
         var rectIndex = 0;
         var subgroupCapacity = 50;
         GameObject islandLabelNumberSubgroup = null;
+//        -maxRectDict Count = 6   System.Collections.Generic.Dictionary<uint, UnityEngine.RectInt>
+//+ [0] "[0, (x:0, y:125, width:150, height:25)]"   System.Collections.Generic.KeyValuePair<uint, UnityEngine.RectInt>
+//+ [1] "[2752530, (x:20, y:98, width:50, height:15)]"  System.Collections.Generic.KeyValuePair<uint, UnityEngine.RectInt>
+//+ [2] "[3866689, (x:66, y:71, width:12, height:19)]"  System.Collections.Generic.KeyValuePair<uint, UnityEngine.RectInt>
+//+ [3] "[4784241, (x:114, y:69, width:16, height:9)]"  System.Collections.Generic.KeyValuePair<uint, UnityEngine.RectInt>
+//+ [4] "[5898252, (x:20, y:37, width:33, height:55)]"  System.Collections.Generic.KeyValuePair<uint, UnityEngine.RectInt>
+//+ [5] "[7077943, (x:57, y:37, width:34, height:19)]"  System.Collections.Generic.KeyValuePair<uint, UnityEngine.RectInt>
+
         foreach (var kv in maxRectDict)
         {
             if (Verbose)

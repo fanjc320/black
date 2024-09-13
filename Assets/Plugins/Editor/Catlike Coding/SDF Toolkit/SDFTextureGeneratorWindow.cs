@@ -179,7 +179,7 @@ namespace CatlikeCoding.SDFToolkit.Editor {
 				AssetDatabase.ImportAsset(path);
 			}
 			SDFTextureGenerator.Generate(
-				source, destination, insideDistance, outsideDistance, postProcessDistance, rgbFillMode);
+				source, destination, insideDistance, outsideDistance, postProcessDistance, rgbFillMode);//!!!!!!!
 			if (!isReadble || !uncompressed) {
 				importer.isReadable = isReadble;
 				importer.textureCompression = compression;

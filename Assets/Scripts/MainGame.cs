@@ -104,9 +104,16 @@ public class MainGame : MonoBehaviour
             stageData = (StageData) formatter.Deserialize(stream);
             stream.Close();
         }
+//        -islandDataByMinPoint    Count = 6   System.Collections.Generic.Dictionary<uint, IslandData>
+//+ [0] "[0, IslandData]"   System.Collections.Generic.KeyValuePair<uint, IslandData>
+//+ [1] "[2752530, IslandData]" System.Collections.Generic.KeyValuePair<uint, IslandData>
+//+ [2] "[3866689, IslandData]" System.Collections.Generic.KeyValuePair<uint, IslandData>
+//+ [3] "[4784241, IslandData]" System.Collections.Generic.KeyValuePair<uint, IslandData>
+//+ [4] "[5898252, IslandData]" System.Collections.Generic.KeyValuePair<uint, IslandData>
+//+ [5] "[7077943, IslandData]" System.Collections.Generic.KeyValuePair<uint, IslandData>
 
         stageData.islandCountByColor = stageData.islandDataByMinPoint.GroupBy(g => g.Value.rgba)
-            .ToDictionary(g => g.Key, g => g.Count());
+            .ToDictionary(g => g.Key, g => g.Count());//islandCountByColor:[0],"[4294901246, 3]";[1],"[4287221774, 1]";[2],"[4290008205, 1]";[3],"[4283189238, 1]"
 
         if (Verbose)
         {

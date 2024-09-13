@@ -24,8 +24,8 @@ internal static class StageEditorUtil
                 var assetPath = AssetDatabase.GetAssetPath(targetObject);
                 var assetDirName = Path.GetDirectoryName(assetPath);
                 Debug.Log($"TestImageArr assetPath:{assetPath} assetDirName:{assetDirName}");
-                //Program.TestImageArr(Selection.objects[i], false);
-                Program.TestImageArr(assetPath);
+                //Program.TestImageAlg(Selection.objects[i], false);
+                Program.TestImageAlg(assetPath);
                 }
         }
         else

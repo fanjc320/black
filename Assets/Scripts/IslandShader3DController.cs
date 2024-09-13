@@ -21,7 +21,8 @@ public class IslandShader3DController : MonoBehaviour
     StageData stageData;
     
     Material targetMaterial;
-
+    //https://docs.unity.cn/cn/2019.4/ScriptReference/Shader.PropertyToID.html
+    //着色器属性的每个名称（例如 _MainTex 或 _Color）均分配有唯一 整数，在整个游戏中，该整数均保持相同
     static readonly int A1Tex = Shader.PropertyToID("_A1Tex");
     static readonly int A2Tex = Shader.PropertyToID("_A2Tex");
     static readonly int Palette = Shader.PropertyToID("_Palette");
@@ -30,12 +31,12 @@ public class IslandShader3DController : MonoBehaviour
     static readonly int PaletteTex = Shader.PropertyToID("_PaletteTex");
 
     public void Initialize(StageMetadata stageMetadata)
-    {   
-        // Material 인스턴스 런타임에 복제 생성한다.
+    {
+        // Material 在实例运行时创建克隆。
 
         if (targetMeshRenderer != null)
         {
-            targetMeshRenderer.material = Instantiate(targetMeshRenderer.material);
+            targetMeshRenderer.material = Instantiate(targetMeshRenderer.material);//"Single Island Material (Instance)(Clone) (Instance) (UnityEngine.Material)"
             targetMaterial = targetMeshRenderer.material;
         }
         
@@ -51,8 +52,8 @@ public class IslandShader3DController : MonoBehaviour
             return;
         }
 
-        var a1Tex = stageMetadata.A1Tex;
-        var a2Tex = stageMetadata.A2Tex;
+        var a1Tex = stageMetadata.A1Tex;//"051-OTB-FSNB-DIT-A1 (UnityEngine.Texture2D)"
+        var a2Tex = stageMetadata.A2Tex;//"051-OTB-FSNB-DIT-A2 (UnityEngine.Texture2D)"
 
         targetMaterial.SetTexture(A1Tex, a1Tex);
         targetMaterial.SetTexture(A2Tex, a2Tex);
@@ -61,9 +62,15 @@ public class IslandShader3DController : MonoBehaviour
         var formatter = new BinaryFormatter();
         stageData = (StageData) formatter.Deserialize(stream);
         stream.Close();
+        //-colorUintArray  uint[5] uint[]
+        //[0] 4278190080  uint
+        //[1] 4283189238  uint
+        //[2] 4287221774  uint
+        //[3] 4290008205  uint
+        //[4] 4294901246  uint
 
         var colorUintArray =
-            new[] {BlackConvert.GetC(new Color32(0, 0, 0, 255))} // 팔레트의 0번째는 언제나 검은색으로, 아웃라인 전용으로 예약되어 있다.
+            new[] {BlackConvert.GetC(new Color32(0, 0, 0, 255)) } // 调色板中的第 0 个始终为黑色，仅用于轮廓。
                 .Concat(stageData.CreateColorUintArray())
                 .ToArray();
 
@@ -73,6 +80,13 @@ public class IslandShader3DController : MonoBehaviour
         }
         else
         {
+//            -paletteArray    UnityEngine.Color[5]    UnityEngine.Color[]
+//+[0] "RGBA(0.000, 0.000, 0.000, 1.000)"  UnityEngine.Color
+//+ [1] "RGBA(0.965, 0.278, 0.298, 1.000)"  UnityEngine.Color
+//+ [2] "RGBA(0.055, 0.816, 0.537, 1.000)"  UnityEngine.Color
+//+ [3] "RGBA(0.553, 0.329, 0.706, 1.000)"  UnityEngine.Color
+//+ [4] "RGBA(0.996, 0.992, 0.996, 1.000)"  UnityEngine.Color
+
             var paletteArray = colorUintArray.Select(BlackConvert.GetColor).ToArray();
             targetMaterial.SetColorArray(Palette, paletteArray);
 
@@ -93,7 +107,7 @@ public class IslandShader3DController : MonoBehaviour
             paletteTex.wrapMode = TextureWrapMode.Clamp;
             paletteTex.Apply();
 
-            targetMaterial.SetTexture(PaletteTex, paletteTex);
+            targetMaterial.SetTexture(PaletteTex, paletteTex);//!!!!!!!!!!!!
         }
 
         ClearAndEnqueueIslandIndex(0);
@@ -108,7 +122,7 @@ public class IslandShader3DController : MonoBehaviour
 
     public void SetIslandIndex(int islandIndex)
     {
-        targetMaterial.SetInt(IslandIndex, islandIndex);
+        targetMaterial.SetInt(IslandIndex, islandIndex);//"Single Island Material (Instance)(Clone) (Instance) (UnityEngine.Material)"
         if (targetImageQuadCamera)
         {
             targetImageQuadCamera.RenderOneFrame();

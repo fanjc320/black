@@ -1,6 +1,6 @@
 //
-// _PaletteIndex로 지정한 팔레트 색상의 모든 칸을
-// _RenderColor로 지정한 색상으로 한번에 렌더링
+// _PaletteIndex到 调色板颜色 指定的所有框
+// _RenderColor以指定的颜色一次渲染
 //
 Shader "Black/Single Palette Shader"
 {

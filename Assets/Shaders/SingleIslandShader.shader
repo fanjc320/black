@@ -1,6 +1,6 @@
 //
-// _IslandIndex로 지정한 한칸만 렌더링하거나,
-// _FullRender를 이용해 모든 색칠이 완성된 이미지를 렌더링하거나
+// _IslandIndex仅呈现一个 Square，或,
+// _FullRender渲染全彩色图像，或
 //
 Shader "Black/Single Island Shader"
 {
@@ -52,6 +52,10 @@ Shader "Black/Single Island Shader"
         Blend SrcAlpha OneMinusSrcAlpha // Traditional transparency
         ColorMask [_ColorMask]
         
+//https://docs.unity.cn/cn/2021.1/Manual/SL-ColorMask.html
+// 对此通道启用仅写入 RGB 通道，这会禁用向 Alpha 通道写入
+//ColorMask RGB
+
         Pass
         {
             CGPROGRAM
@@ -77,7 +81,7 @@ Shader "Black/Single Island Shader"
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex; // 안쓰지만 없으면 경고 메시지 나오니까 보기 싫어서 넣어 둔다.
+            sampler2D _MainTex; // 我不使用它，但如果我没有它，我会收到一条警告消息，所以我不想看到它，所以我把它放进去。
             sampler2D_float _A1Tex;
             sampler2D_float _A2Tex;
             sampler2D_float _PaletteTex;

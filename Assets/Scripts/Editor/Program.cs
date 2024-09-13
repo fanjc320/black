@@ -65,18 +65,37 @@ namespace black_dev_tools
                 ProcessSingleFileAdaptiveOutlineThreshold(args);
         }
 
-        public static void TestImageArr(string path)
+        public static void TestImageAlg(string path)
         {
-            var image = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
-            TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg").GetComponent<TestImgDbg>();
-            RawImage rawImg = GameObject.Find("Canvas/RawImage").GetComponent<RawImage>();
-            if (ttImg == null)
+            //var image0 = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
+            //TestImgDbg ttImg = GameObject.Find("Canvas/DebugImg").GetComponent<TestImgDbg>();
+            //RawImage rawImg = GameObject.Find("Canvas/RawImage").GetComponent<RawImage>();
+            //if (ttImg == null)
+            //{
+            //    Debug.LogError("ExecuteFillIfNotBlack -----  img is null");
+            //}
+            //Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(image0);
+            //ttImg.setImg(tex);
+            //rawImg.texture = tex;
+
+            //string sourceFileName = "Assets/Stages/051/rect4.jpg";
+            string sourceFileName = path;
+            var targetFileName = AppendToFileName(sourceFileName, "-SDF");
+            using (var image = Image.Load<Rgba32>(sourceFileName))
             {
-                Debug.LogError("ExecuteFillIfNotBlack -----  img is null");
+                var targetImage = new Image<Rgba32>(image.Width, image.Height);
+
+                //SDFTextureGenerator.Generate(image, targetImage, 0, 3, 0, RGBFillMode.White);//空白
+                //SDFTextureGenerator.Generate(image, targetImage, 0, 3, 0, RGBFillMode.Black);//ok
+                SDFTextureGenerator.Generate(image, targetImage, 0, 3, 0, RGBFillMode.Distance);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
+                using (var stream = new FileStream(targetFileName, FileMode.Create))
+                {
+                    targetImage.SaveAsPng(stream);
+                    stream.Close();
+                }
             }
-            Texture2D tex = Assets.Scripts.ImageExtensions.ToUnityTexture(image);
-            ttImg.setImg(tex);
-            rawImg.texture = tex;
         }
 
             static void ProcessSingleFileAdaptiveOutlineThreshold(string[] args)
@@ -120,7 +139,6 @@ namespace black_dev_tools
             Logger.WriteLine($"Running {nameof(ExecuteSdf)} sourceFileName:{sourceFileName}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-SDF");
-            System.Drawing.Image tmp;
             using (var image = Image.Load<Rgba32>(sourceFileName))
             {
                 var targetImage = new Image<Rgba32>(image.Width, image.Height);

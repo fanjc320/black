@@ -325,7 +325,7 @@ public class SaveLoadManager : MonoBehaviour, IPlatformSaveLoadManager
         {
             // 没有保存文件。
             // 我是新用户~~~让风铃响~~~~~~
-            ProcessNewUser(context, exceptionList[0]);
+            ProcessNewUser(context, exceptionList[0]);//"Black Context (BlackContext)","SaveFileNotFoundException: Exception of type \'SaveFileNotFoundException\' was thrown.\r\n  at SaveLoadManager.LoadBlackSaveData () [0x00062] in 
         }
         else if (exceptionList.Any(e => e.GetType() == typeof(NotSupportedBlackSaveDataVersionException)))
         {
