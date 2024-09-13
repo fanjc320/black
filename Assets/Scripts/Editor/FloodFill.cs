@@ -152,7 +152,7 @@ namespace black_dev_tools
                     Program.IncreaseCountOfDictionaryValue(originalColors, oldColor);
                     UpdateFillMinPoint(ref fillMinPoint, e);
 #if TestFill
-                    SetPixel(bitmapTest, fillMinPoint.x, fillMinPoint.y, Green);//基本上fillMinPoint没变
+                    SetPixel(bitmapTest, fillMinPoint.x, fillMinPoint.y, Green);//
                     //SetPixel(bitmapTest, e.x, e.y, Green);//明显看出填充效果
 
                     ////Logger.WriteLine($"ExecuteFillIfNotBlack 11 oldColor:{oldColor} replacementColor:{replacementColor} fillMinPoint:{fillMinPoint} w:{w} pt:{pt}");

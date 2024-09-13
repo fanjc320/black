@@ -108,10 +108,11 @@ internal static class StageEditorUtil
 #if IMAGESHARP
         Program.Main(new[]
         {
-            ///* 00 */ "dit",
+            /* 00 */ "dit",
             ///* 00 */ "fsnb",
             ///* 00 */ "q",
-            "fots",
+            //"fots",
+            //"di",
             /* 01 */ assetPath,
             /* 02 */ maxPaletteCount.ToString(),
             /* 03 */ "",
@@ -177,7 +178,7 @@ internal static class StageEditorUtil
         }
 
         var sdfTexPath = Path.Combine(stageDir, $"{metadataName}-OTB-FSNB-BB-SDF.png");
-        var sdfTex = AssetDatabase.LoadAssetAtPath<Texture2D>(sdfTexPath);
+        var sdfTex = AssetDatabase.LoadAssetAtPath<Texture2D>(sdfTexPath);/////!!!!!!!!!
 
         var fsnbTexPath = Path.Combine(stageDir, $"{metadataName}-OTB-FSNB.png");
         var fsnbTex = AssetDatabase.LoadAssetAtPath<Texture2D>(fsnbTexPath);
@@ -190,7 +191,7 @@ internal static class StageEditorUtil
 
         var sdfPresetPath = "Assets/Presets/TextureImporter-SDF.preset";
 
-        var sdfPreset = AssetDatabase.LoadAssetAtPath<Preset>(sdfPresetPath);
+        var sdfPreset = AssetDatabase.LoadAssetAtPath<Preset>(sdfPresetPath);//!!!!!
 
         var fsnbPresetPath = "Assets/Presets/TextureImporter-FSNB.preset";
         var fsnbPreset = AssetDatabase.LoadAssetAtPath<Preset>(fsnbPresetPath);
@@ -220,7 +221,7 @@ internal static class StageEditorUtil
 
         var sdfImporter = AssetImporter.GetAtPath(sdfTexPath);
         Debug.Log(sdfTex);
-        Debug.Log(sdfPreset.ApplyTo(sdfImporter));
+        Debug.Log(sdfPreset.ApplyTo(sdfImporter));//!!!!!!
 
         var a1Importer = AssetImporter.GetAtPath(a1TexPath);
         Debug.Log(a1Tex);
@@ -235,17 +236,17 @@ internal static class StageEditorUtil
 
         var sdfMat = new Material(Shader.Find("Specular"));
         sdfBlackMatPreset.ApplyTo(sdfMat);
-        sdfMat.SetTexture(SdfTexture, sdfTex);
+        sdfMat.SetTexture(SdfTexture, sdfTex);//!!!!!!!!!
         EditorUtility.SetDirty(sdfMat);
         AssetDatabase.CreateAsset(sdfMat, Path.Combine(stageDir, $"{stageName}-SDF.mat"));
 
-        var stageMetadataPath = Path.Combine(stageDir, $"{stageName}.asset");
-        var stageMetadata = AssetDatabase.LoadAssetAtPath<StageMetadata>(stageMetadataPath);
+        var stageMetadataPath = Path.Combine(stageDir, $"{stageName}.asset");//!!!!!!!!
+        var stageMetadata = AssetDatabase.LoadAssetAtPath<StageMetadata>(stageMetadataPath);//!!!!!!!!!!!
         if (stageMetadata == null)
         {
             var newStageMetadata = StageMetadata.Create();
             StageMetadata.SetValues(newStageMetadata, sdfMat, rawStageData, a1Tex, a2Tex);
-            AssetDatabase.CreateAsset(newStageMetadata, stageMetadataPath);
+            AssetDatabase.CreateAsset(newStageMetadata, stageMetadataPath);//!!!!!!!!!!!!
         }
         else
         {

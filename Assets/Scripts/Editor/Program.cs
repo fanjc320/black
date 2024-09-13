@@ -117,7 +117,7 @@ namespace black_dev_tools
 
         static void ExecuteSdf(string sourceFileName)
         {
-            Logger.WriteLine($"Running {nameof(ExecuteSdf)}");
+            Logger.WriteLine($"Running {nameof(ExecuteSdf)} sourceFileName:{sourceFileName}");
 
             var targetFileName = AppendToFileName(sourceFileName, "-SDF");
             System.Drawing.Image tmp;
@@ -292,7 +292,7 @@ namespace black_dev_tools
                 //第二次测试。如果这里出现错误，那就很奇怪了。
                 ExecuteDetermineIslandTest(fsnbFileName, bytesFileName, false, true);
 
-                var bbFileName = ExecuteBoxBlur(fsnbFileName, 1);
+                var bbFileName = ExecuteBoxBlur(fsnbFileName, 1);//为什么要以1为半径模糊?
                 ExecuteSdf(bbFileName);
 
                 // 删除不需要的文件。
